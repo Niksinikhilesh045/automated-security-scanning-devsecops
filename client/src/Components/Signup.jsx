@@ -1,10 +1,14 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Button from "@mui/material/Button";
 import { Card, TextField, Typography } from "@mui/material";
+import { UserContext } from "../App";
+import { useNavigate } from "react-router-dom";
 
 export default function Signup({ client }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const { setUser } = useContext(UserContext);
+  const navigate = useNavigate();
 
   return (
     <div
@@ -52,8 +56,10 @@ export default function Signup({ client }) {
             });
             const data = response.data;
             localStorage.setItem("token", data.token);
+            setUser(username);
             setPassword("");
             setUsername("");
+            navigate("/");
           }}
         >
           Sign Up
