@@ -1,6 +1,6 @@
 import { Button, Typography } from "@mui/material";
 import React, { useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { UserContext } from "../App";
 
 export default function Appbar({ client }) {
@@ -22,12 +22,43 @@ export default function Appbar({ client }) {
     return (
       <div className="navbar">
         <div className="navbar-logo">
-          <Typography variant="h5">Harshera</Typography>
+          <Typography
+            variant="h5"
+            onClick={() => navigate("/")}
+            style={{ cursor: "pointer" }}
+          >
+            Harshera
+          </Typography>
         </div>
         <div className="navbar-options">
-          <div style={{ marginRight: 10, display: "inline" }}>
+          <div style={{ marginRight: 20, display: "inline" }}>
             Hello <strong>{username}!</strong>
           </div>
+
+          <Link
+            to="/addcourse"
+            style={{
+              textDecoration: "none",
+              color: "blue",
+              marginRight: "23px",
+              fontSize: "20px",
+            }}
+          >
+            Add Courses
+          </Link>
+
+          <Link
+            to="/courses"
+            style={{
+              textDecoration: "none",
+              color: "blue",
+              marginRight: "23px",
+              fontSize: "20px",
+            }}
+          >
+            Courses
+          </Link>
+
           <Button
             variant="contained"
             onClick={() => {

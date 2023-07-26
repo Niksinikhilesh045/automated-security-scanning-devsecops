@@ -32,13 +32,10 @@ const Admin = mongoose.model("Admin", adminSchema);
 const Course = mongoose.model("Course", courseSchema);
 
 mongoose
-  .connect(
-    "mongodb+srv://harsh:Gaming6176@cluster0.lrwi214.mongodb.net/courses",
-    {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    }
-  )
+  .connect("mongodb://localhost:27017", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then((result) => {
     console.log("MongoDB connection started");
     app.listen(3000, () => {
@@ -125,6 +122,22 @@ app.get("/admin/courses", adminAuthenticateJWT, async (req, res) => {
   const courses = await Course.find();
   res.json({ courses });
 });
+
+app.get("/admin/courses/:courseId", adminAuthenticateJWT, async (req, res) => {
+  const id = req.params.courseId;
+  const course = await Course.findOne({ _id: new mongoose.Types.ObjectId(id) });
+  res.json(course);
+});
+
+app.delete(
+  "/admin/courses/:courseId",
+  adminAuthenticateJWT,
+  async (req, res) => {
+    const id = req.params.courseId;
+    await Course.deleteOne({ _id: new mongoose.Types.ObjectId(id) });
+    res.json({ mssg: "Deleted successfully!" });
+  }
+);
 
 // User routes
 app.post("/users/signup", async (req, res) => {

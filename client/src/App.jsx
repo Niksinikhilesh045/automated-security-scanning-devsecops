@@ -6,6 +6,15 @@ import Signin from "./Components/Signin";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import axios from "axios";
 import AddCourse from "./Components/AddCourse";
+import Courses from "./Components/Courses";
+import UpdateCourse from "./Components/UpdateCourse";
+import {
+  RecoilRoot,
+  atom,
+  selector,
+  useRecoilState,
+  useRecoilValue,
+} from "recoil";
 const client = axios.create({ baseURL: "http://localhost:3000" });
 
 export const UserContext = createContext(null);
@@ -18,20 +27,33 @@ function App() {
     <>
       <div className="container">
         <UserContext.Provider value={{ setUser, user }}>
-          <Router>
-            <Appbar client={client} />
-            <Routes>
-              <Route
-                path="/addcourse"
-                element={<AddCourse client={client} />}
-              ></Route>
-              <Route path="/login" element={<Signin client={client} />}></Route>
-              <Route
-                path="/signup"
-                element={<Signup client={client} />}
-              ></Route>
-            </Routes>
-          </Router>
+          <RecoilRoot>
+            <Router>
+              <Appbar client={client} />
+              <Routes>
+                <Route
+                  path="/addcourse"
+                  element={<AddCourse client={client} />}
+                ></Route>
+                <Route
+                  path="/course/:courseId"
+                  element={<UpdateCourse client={client} />}
+                ></Route>
+                <Route
+                  path="/login"
+                  element={<Signin client={client} />}
+                ></Route>
+                <Route
+                  path="/signup"
+                  element={<Signup client={client} />}
+                ></Route>
+                <Route
+                  path="/courses"
+                  element={<Courses client={client} />}
+                ></Route>
+              </Routes>
+            </Router>
+          </RecoilRoot>
         </UserContext.Provider>
       </div>
     </>

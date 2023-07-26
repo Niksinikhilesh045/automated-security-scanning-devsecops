@@ -33,6 +33,7 @@ export default function Signup({ client }) {
           onChange={(e) => {
             setUsername(e.target.value);
           }}
+          required
         />
         <br /> <br />
         <TextField
@@ -43,6 +44,7 @@ export default function Signup({ client }) {
           onChange={(e) => {
             setPassword(e.target.value);
           }}
+          required
           fullWidth
         />
         <br /> <br />
@@ -50,6 +52,7 @@ export default function Signup({ client }) {
           variant="contained"
           size="large"
           onClick={async () => {
+            if (username == "" || password == "") return;
             const response = await client.post("/admin/signup", {
               username,
               password,

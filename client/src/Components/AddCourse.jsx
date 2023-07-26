@@ -4,6 +4,7 @@ import React, { useState } from "react";
 export default function AddCourse({ client }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [image, setImage] = useState("");
 
   return (
     <div
@@ -34,6 +35,14 @@ export default function AddCourse({ client }) {
           onChange={(e) => setDescription(e.target.value)}
         />
         <br /> <br />
+        <TextField
+          label="Image URL"
+          variant="outlined"
+          fullWidth
+          value={image}
+          onChange={(e) => setImage(e.target.value)}
+        />
+        <br /> <br />
         <Button
           variant="contained"
           size="large"
@@ -43,7 +52,7 @@ export default function AddCourse({ client }) {
               {
                 title,
                 description,
-                imageLink: "",
+                imageLink: image,
                 published: true,
               },
               {
@@ -55,6 +64,7 @@ export default function AddCourse({ client }) {
 
             setDescription("");
             setTitle("");
+            setImage("");
           }}
         >
           Add Course
