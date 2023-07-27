@@ -10,7 +10,7 @@ export default function Appbar({ client }) {
 
   useEffect(() => {
     client
-      .get("/admin/me", {
+      .get(`/${localStorage.getItem("role")}/me`, {
         headers: { authorization: "Bearer " + localStorage.getItem("token") },
       })
       .then((response) => {
@@ -35,17 +35,33 @@ export default function Appbar({ client }) {
             Hello <strong>{username}!</strong>
           </div>
 
-          <Link
-            to="/addcourse"
-            style={{
-              textDecoration: "none",
-              color: "blue",
-              marginRight: "23px",
-              fontSize: "20px",
-            }}
-          >
-            Add Courses
-          </Link>
+          {localStorage.getItem("role") === "admin" && (
+            <Link
+              to="/addcourse"
+              style={{
+                textDecoration: "none",
+                color: "blue",
+                marginRight: "23px",
+                fontSize: "20px",
+              }}
+            >
+              Add Courses
+            </Link>
+          )}
+
+          {localStorage.getItem("role") === "users" && (
+            <Link
+              to="/purchased"
+              style={{
+                textDecoration: "none",
+                color: "blue",
+                marginRight: "23px",
+                fontSize: "20px",
+              }}
+            >
+              Purchased Courses
+            </Link>
+          )}
 
           <Link
             to="/courses"
@@ -77,7 +93,13 @@ export default function Appbar({ client }) {
   return (
     <div className="navbar">
       <div className="navbar-logo">
-        <Typography variant="h5">Harshera</Typography>
+        <Typography
+          variant="h5"
+          onClick={() => navigate("/")}
+          style={{ cursor: "pointer" }}
+        >
+          Harshera
+        </Typography>
       </div>
       <div className="navbar-options">
         <Button

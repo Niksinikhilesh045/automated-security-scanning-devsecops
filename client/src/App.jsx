@@ -15,6 +15,8 @@ import {
   useRecoilState,
   useRecoilValue,
 } from "recoil";
+import PurchaseCourses from "./Components/PurchaseCourses";
+import Home from "./Components/Home";
 const client = axios.create({ baseURL: "http://localhost:3000" });
 
 export const UserContext = createContext(null);
@@ -31,6 +33,7 @@ function App() {
             <Router>
               <Appbar client={client} />
               <Routes>
+                <Route path="/" element={<Home />}></Route>
                 <Route
                   path="/addcourse"
                   element={<AddCourse client={client} />}
@@ -50,6 +53,10 @@ function App() {
                 <Route
                   path="/courses"
                   element={<Courses client={client} />}
+                ></Route>
+                <Route
+                  path="/purchased"
+                  element={<PurchaseCourses client={client} />}
                 ></Route>
               </Routes>
             </Router>

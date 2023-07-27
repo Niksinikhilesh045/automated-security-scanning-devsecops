@@ -6,7 +6,7 @@ export default function Courses({ client }) {
   const [courses, setCourses] = useState([]);
   useEffect(() => {
     client
-      .get("/admin/courses", {
+      .get(`/${localStorage.getItem("role")}/courses`, {
         headers: { authorization: "Beared " + localStorage.getItem("token") },
       })
       .then((response) => {
@@ -23,7 +23,9 @@ export default function Courses({ client }) {
             description={course.description}
             image={course.imageLink}
             courseId={course._id}
-            edit={true}
+            price={course.price || "Free"}
+            edit={localStorage.getItem("role") === "admin"}
+            purchase={localStorage.getItem("role") === "users"}
           />
         </div>
       ))}
@@ -31,7 +33,15 @@ export default function Courses({ client }) {
   );
 }
 
-export function Course({ title, description, image, courseId, edit }) {
+export function Course({
+  title,
+  description,
+  image,
+  courseId,
+  price,
+  edit,
+  purchase,
+}) {
   const navigate = useNavigate();
   function handleSelect(courseId) {
     navigate(`/course/${courseId}`);
@@ -43,10 +53,11 @@ export function Course({ title, description, image, courseId, edit }) {
         style={{
           width: "300px",
           padding: 20,
-          minHeight: "200px",
+          height: "300px",
           display: "flex",
           alignItems: "center",
           flexDirection: "column",
+          position: "relative",
         }}
       >
         <img
@@ -54,22 +65,54 @@ export function Course({ title, description, image, courseId, edit }) {
           alt="course"
           style={{
             height: "150px",
-            minWidth: "85%",
+            minWidth: "100%",
             objectFit: "cover",
           }}
         />
         <Typography variant="h5" textAlign="center">
           {title}
         </Typography>
-        <Typography variant="subtitle1">{description}</Typography>
+        <Typography
+          variant="subtitle1"
+          style={{ overflow: "hidden", height: 50 }}
+        >
+          {description}
+        </Typography>
+        <Typography
+          variant="subtitle3"
+          style={{
+            position: "absolute",
+            bottom: "60px",
+            color: "blue",
+            background: "yellow",
+          }}
+        >
+          <strong>{price != "Free" && "Price:- $"}</strong>
+          {price}
+        </Typography>
         {edit ? (
           <Button
             variant="contained"
             onClick={() => {
               handleSelect(courseId);
             }}
+            style={{ position: "absolute", bottom: "15px" }}
           >
             EDIT
+          </Button>
+        ) : (
+          <></>
+        )}
+
+        {purchase ? (
+          <Button
+            variant="contained"
+            onClick={() => {
+              handleSelect(courseId);
+            }}
+            style={{ position: "absolute", bottom: "15px" }}
+          >
+            ℹ Details
           </Button>
         ) : (
           <></>

@@ -1,26 +1,37 @@
 import React, { useState, useContext } from "react";
 import Button from "@mui/material/Button";
-import { Card, TextField, Typography } from "@mui/material";
+import {
+  Card,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { UserContext } from "../App";
 import { useNavigate } from "react-router-dom";
 
 export default function Signin({ client }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const { setUser } = useContext(UserContext);
+  const [role, setRole] = useState("");
+
+  const { setUser, user } = useContext(UserContext);
   const navigate = useNavigate();
 
   const login = async () => {
     if (username == "" || password == "") return;
 
     const response = await client.post(
-      "/admin/login",
+      `/${role}/login`,
       {},
       { headers: { username, password } }
     );
     const data = response.data;
     localStorage.setItem("token", data.token);
-    setUser(username);
+    localStorage.setItem("role", role);
+    setUser(username + Date.now());
     navigate("/");
   };
 
@@ -56,6 +67,23 @@ export default function Signin({ client }) {
           required
         />
         <br /> <br />
+        <FormControl fullWidth>
+          <InputLabel id="demo-simple-select-label">Who is this?</InputLabel>
+          <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            value={role}
+            label="Who is this?"
+            onChange={(e) => {
+              setRole(e.target.value);
+            }}
+          >
+            <MenuItem value={"admin"}>Admin</MenuItem>
+            <MenuItem value={"users"}>User</MenuItem>
+          </Select>
+        </FormControl>
+        <br />
+        <br />
         <Button variant="contained" size="large" onClick={login}>
           Sign In
         </Button>

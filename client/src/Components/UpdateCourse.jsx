@@ -2,19 +2,21 @@ import React, { useEffect } from "react";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Course } from "./Courses";
-import { Button, Card, TextField, Typography } from "@mui/material";
+import { Button, Card, Grid, TextField, Typography } from "@mui/material";
 
 export default function UpdateCourse({ client }) {
+  const { courseId } = useParams();
   const [title, setTitle] = useState(null);
   const [description, setDescription] = useState(null);
   const [image, setImage] = useState(null);
   const [id, setId] = useState(null);
+  const [price, setPrice] = useState(null);
+  const [disabled, setDisabled] = useState(false);
 
   const [course, setCourse] = useState(null);
-  const { courseId } = useParams();
   useEffect(() => {
     client
-      .get(`/admin/courses/${courseId}`, {
+      .get(`/${localStorage.getItem("role")}/courses/${courseId}`, {
         headers: { authorization: "Bearer " + localStorage.getItem("token") },
       })
       .then((response) => {
@@ -23,9 +25,94 @@ export default function UpdateCourse({ client }) {
         setDescription(response.data.description);
         setImage(response.data.imageLink);
         setId(response.data._id);
+        setPrice(response.data.price);
       });
   }, []);
+
+  client
+    .get("/users/purchasedCourses", {
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("token"),
+      },
+    })
+    .then((response) => {
+      const data = response.data.purchasedCourses;
+      const purchased = data.find((eachCourse) => eachCourse._id === id);
+      console.log(purchased);
+      if (purchased) setDisabled(true);
+    });
+
   if (!course) return <div></div>;
+  if (localStorage.getItem("role") === "users") {
+    return (
+      <>
+        <div style={{ position: "relative" }}>
+          <div
+            style={{
+              background: "black",
+              color: "white",
+              width: "100%",
+              height: "120px",
+              textAlign: "center",
+            }}
+          >
+            <h1 style={{ paddingTop: 40 }}>{title}</h1>
+          </div>
+        </div>
+
+        <div style={{ position: "absolute" }}>
+          <Grid container>
+            <Grid item lg={8} md={12} sm={12}>
+              <Course
+                image={image}
+                title={title}
+                description={description}
+                edit={false}
+                purchase={false}
+                price={price}
+              ></Course>
+            </Grid>
+            <Grid
+              item
+              lg={4}
+              md={12}
+              sm={12}
+              style={{ paddingRight: "50px", paddingTop: "20px" }}
+            >
+              <h1>Certificate:</h1>
+              <br />
+              <img
+                src="https://udemy-certificate.s3.amazonaws.com/image/UC-bbb1e2d3-634b-40aa-8aec-b15466c0b084.jpg?v=1689755353000"
+                alt="cretificate"
+                style={{ width: "100%" }}
+              />
+            </Grid>
+          </Grid>
+          <Button
+            variant="contained"
+            size="large"
+            style={{ marginLeft: 40, marginBottom: 70 }}
+            onClick={(e) => {
+              client.post(
+                `/users/courses/${id}`,
+                {},
+                {
+                  headers: {
+                    authorization: "Bearer " + localStorage.getItem("token"),
+                  },
+                }
+              );
+              window.alert("Course Purchased");
+              setDisabled(true);
+            }}
+            disabled={disabled}
+          >
+            {disabled ? "Purchased" : "Purchase"}
+          </Button>
+        </div>
+      </>
+    );
+  }
   return (
     <div style={{ display: "flex", justifyContent: "space-around" }}>
       <Course
@@ -33,6 +120,7 @@ export default function UpdateCourse({ client }) {
         title={title}
         description={description}
         edit={false}
+        price={price}
       />
       <UpdateCourseFields
         client={client}
@@ -42,6 +130,8 @@ export default function UpdateCourse({ client }) {
         setDescription={setDescription}
         title={title}
         setTitle={setTitle}
+        price={price}
+        setPrice={setPrice}
         id={id}
       />
     </div>
@@ -57,6 +147,8 @@ function UpdateCourseFields({
   title,
   setTitle,
   id,
+  price,
+  setPrice,
 }) {
   const navigate = useNavigate();
   return (
@@ -98,6 +190,14 @@ function UpdateCourseFields({
           onChange={(e) => setImage(e.target.value)}
         />
         <br /> <br />
+        <TextField
+          label="Price"
+          variant="outlined"
+          fullWidth
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
+        />
+        <br /> <br />
         <Button
           variant="contained"
           size="large"
@@ -109,6 +209,7 @@ function UpdateCourseFields({
                 description,
                 imageLink: image,
                 published: true,
+                price,
               },
               {
                 headers: {

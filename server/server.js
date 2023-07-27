@@ -32,10 +32,13 @@ const Admin = mongoose.model("Admin", adminSchema);
 const Course = mongoose.model("Course", courseSchema);
 
 mongoose
-  .connect("mongodb://localhost:27017", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(
+    "mongodb://localhost:20717/courses",
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    }
+  )
   .then((result) => {
     console.log("MongoDB connection started");
     app.listen(3000, () => {
@@ -140,6 +143,11 @@ app.delete(
 );
 
 // User routes
+
+app.get("/users/me", userAuthenticateJWT, (req, res) => {
+  res.json({ username: req.user.username });
+});
+
 app.post("/users/signup", async (req, res) => {
   // logic to sign up user
   const { username, password } = req.body;
@@ -149,7 +157,9 @@ app.post("/users/signup", async (req, res) => {
   }
   const newUser = new User({ username, password });
   await newUser.save();
-  const token = jwt.sign({ username, role: "user" }, secret);
+  const token = jwt.sign({ username, role: "user" }, secret, {
+    expiresIn: "1h",
+  });
   res.json({ message: "User created successfully", token });
 });
 
@@ -159,7 +169,9 @@ app.post("/users/login", async (req, res) => {
   if (!(await User.findOne({ username, password }))) {
     return res.sendStatus(403);
   }
-  const token = jwt.sign({ username, role: "user" }, secret);
+  const token = jwt.sign({ username, role: "user" }, secret, {
+    expiresIn: "1h",
+  });
   res.json({ message: "Logged in successfully", token });
 });
 
@@ -197,6 +209,12 @@ app.get("/users/purchasedCourses", userAuthenticateJWT, async (req, res) => {
   res.status(403).json({ message: "User not found" });
 });
 
+app.get("/users/courses/:courseId", userAuthenticateJWT, async (req, res) => {
+  const id = req.params.courseId;
+  const course = await Course.findOne({ _id: new mongoose.Types.ObjectId(id) });
+  res.json(course);
+});
+
 function adminAuthenticateJWT(req, res, next) {
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(" ")[1];
@@ -204,7 +222,7 @@ function adminAuthenticateJWT(req, res, next) {
     return res.status(401).json({ error: "Authorization Token is missing" });
   }
   jwt.verify(token, secret, (err, admin) => {
-    if (err || admin.role != "admin") {
+    if (err || admin.role !== "admin") {
       return res.status(401).json({ error: "Admin no longer exists." });
     }
     req.admin = admin;
@@ -219,7 +237,7 @@ function userAuthenticateJWT(req, res, next) {
     return res.status(401).json({ error: "Authorization Token is missing" });
   }
   jwt.verify(token, secret, (err, user) => {
-    if (err) {
+    if (err || user.role === "admin") {
       return res.status(401).json({ error: "User no longer exists." });
     }
     req.user = user;

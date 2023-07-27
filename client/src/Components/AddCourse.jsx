@@ -2,9 +2,12 @@ import { Button, Card, TextField, Typography } from "@mui/material";
 import React, { useState } from "react";
 
 export default function AddCourse({ client }) {
+  if (localStorage.getItem("role") === "users") return <div></div>;
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState("");
+  const [price, setPrice] = useState(null);
 
   return (
     <div
@@ -15,7 +18,7 @@ export default function AddCourse({ client }) {
         alignItems: "center",
       }}
     >
-      <div style={{ paddingTop: 150, marginBottom: 10 }}>
+      <div style={{ paddingTop: 100, marginBottom: 10 }}>
         <Typography variant="h6">Write details about course to add.</Typography>
       </div>
       <Card variant="outlined" style={{ width: 500, padding: 20 }}>
@@ -43,6 +46,14 @@ export default function AddCourse({ client }) {
           onChange={(e) => setImage(e.target.value)}
         />
         <br /> <br />
+        <TextField
+          label="Price"
+          variant="outlined"
+          fullWidth
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
+        />
+        <br /> <br />
         <Button
           variant="contained"
           size="large"
@@ -54,6 +65,7 @@ export default function AddCourse({ client }) {
                 description,
                 imageLink: image,
                 published: true,
+                price,
               },
               {
                 headers: {
