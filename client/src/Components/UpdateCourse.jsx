@@ -38,7 +38,6 @@ export default function UpdateCourse({ client }) {
     .then((response) => {
       const data = response.data.purchasedCourses;
       const purchased = data.find((eachCourse) => eachCourse._id === id);
-      console.log(purchased);
       if (purchased) setDisabled(true);
     });
 
