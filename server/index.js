@@ -7,6 +7,8 @@ const adminRouter = require("./Routes/admin");
 const mongoose = require("mongoose");
 config();
 
+const PORT = process.env.PORT || 3000;
+
 mongoose
   .connect(process.env.DB_URL, {
     useNewUrlParser: true,
@@ -14,7 +16,7 @@ mongoose
   })
   .then((result) => {
     console.log("MongoDB connection started");
-    app.listen(3000, () => {
+    app.listen(PORT, () => {
       console.log("Server is listening on port 3000");
     });
   })
