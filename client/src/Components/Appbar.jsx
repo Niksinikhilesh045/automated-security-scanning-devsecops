@@ -1,12 +1,14 @@
 import { Button, Typography } from "@mui/material";
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { UserContext } from "../App";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { userState } from "../store/atoms/user";
+import Loading from "./Loading";
 
 export default function Appbar({ client }) {
+  const user = useRecoilValue(userState);
+  const setUser = useSetRecoilState(userState);
   const navigate = useNavigate();
-  const [username, setUsername] = useState(null);
-  const { setUser, user } = useContext(UserContext);
 
   useEffect(() => {
     client
@@ -14,11 +16,13 @@ export default function Appbar({ client }) {
         headers: { authorization: "Bearer " + localStorage.getItem("token") },
       })
       .then((response) => {
-        setUsername(response.data.username);
+        setUser({ isLoading: false, username: response.data.username });
       });
-  }, [user]);
+  }, [user.username]);
 
-  if (username) {
+  if (user.isLoading) return <Loading />;
+
+  if (user.username) {
     return (
       <div className="navbar">
         <div className="navbar-logo">
@@ -32,7 +36,7 @@ export default function Appbar({ client }) {
         </div>
         <div className="navbar-options">
           <div style={{ marginRight: 20, display: "inline" }}>
-            Hello <strong>{username}!</strong>
+            Hello <strong>{user.username}!</strong>
           </div>
 
           {localStorage.getItem("role") === "admin" && (
@@ -79,8 +83,8 @@ export default function Appbar({ client }) {
             variant="contained"
             onClick={() => {
               localStorage.setItem("token", null);
-              setUsername(null);
-              setUser(null);
+              localStorage.setItem("role", null);
+              setUser({ username: null, isLoading: false });
             }}
           >
             Logout
