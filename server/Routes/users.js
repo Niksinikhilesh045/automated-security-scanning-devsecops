@@ -72,19 +72,6 @@ router.get("/purchasedCourses", userAuthenticateJWT, async (req, res) => {
   res.status(403).json({ message: "User not found" });
 });
 
-router.get("/purchasedCourses/:id", userAuthenticateJWT, async (req, res) => {
-  const courseId = req.params.id;
-  const { username } = req.user;
-  const user = await User.findOne({ username }).populate("purchasedCourses");
-  if (user) {
-    const course = user.purchasedCourses.find((course) => {
-      return course._id == courseId;
-    });
-    const response = (course && true) || false;
-    res.send(response);
-  }
-});
-
 router.get("/courses/:courseId", userAuthenticateJWT, async (req, res) => {
   const id = req.params.courseId;
   const course = await Course.findOne({ _id: new mongoose.Types.ObjectId(id) });

@@ -1,8 +1,6 @@
 import { Button, Grid, Stack, Typography, styled } from "@mui/material";
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useRecoilValue } from "recoil";
-import { isUserLoading } from "../store/selectors/isUserLoading";
 
 const BootstrapButton = styled(Button)({
   boxShadow: "none",
@@ -42,10 +40,6 @@ const BootstrapButton = styled(Button)({
 
 export default function Home() {
   const navigate = useNavigate();
-  const isLoading = useRecoilValue(isUserLoading);
-
-  if (isLoading) return <div></div>;
-
   return (
     <div
       style={{

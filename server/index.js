@@ -5,15 +5,17 @@ const { config } = require("dotenv");
 const userRouter = require("./Routes/users");
 const adminRouter = require("./Routes/admin");
 const mongoose = require("mongoose");
-config();
 
 const PORT = process.env.PORT || 3000;
 
 mongoose
-  .connect(process.env.DB_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(
+    "mongodb+srv://harsh:harsh2025@cluster0.lrwi214.mongodb.net/courses",
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    }
+  )
   .then((result) => {
     console.log("MongoDB connection started");
     app.listen(PORT, () => {
@@ -22,6 +24,7 @@ mongoose
   })
   .catch((err) => console.log(err));
 
+config();
 app.use(cors());
 app.use(express.json());
 

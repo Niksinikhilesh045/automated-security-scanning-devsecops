@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Button from "@mui/material/Button";
 import {
   Card,
@@ -9,15 +9,15 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { UserContext } from "../App";
 import { useNavigate } from "react-router-dom";
-import { useRecoilState, useSetRecoilState } from "recoil";
-import { userState } from "../store/atoms/user";
+import { useRecoilState } from "recoil";
 
 export default function Signup({ client }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("");
-  const setUser = useSetRecoilState(userState);
+  const { setUser } = useContext(UserContext);
   const navigate = useNavigate();
 
   function handleChange(e) {
@@ -82,7 +82,6 @@ export default function Signup({ client }) {
           variant="contained"
           size="large"
           onClick={async () => {
-            setUser({ username: null, isLoading: true });
             if (username == "" || password == "") return;
             const response = await client.post(`/${role}/signup`, {
               username,
@@ -90,7 +89,7 @@ export default function Signup({ client }) {
             });
             const data = response.data;
             localStorage.setItem("token", data.token);
-            setUser({ username, isLoading: false });
+            setUser(username + Date.now());
             setPassword("");
             setUsername("");
             navigate("/");
