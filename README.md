@@ -20,3 +20,4 @@ By the end of this you should have two frontends -
 2. One for the user side of the app (03-hard-course-selling-app-user-side
 
 ### ssh-keyscan ec2-3-84-137-90.compute-1.amazonaws.com >> known_hosts
+testing
