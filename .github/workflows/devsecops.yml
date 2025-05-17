@@ -28,6 +28,15 @@ jobs:
 
     - name: 🔐 Secret Scan with Gitleaks
       uses: gitleaks/gitleaks-action@v2.3.2
+      with:
+        report-format: sarif
+        report-path: gitleaks-results.sarif
+
+    - name: Upload Gitleaks report
+      uses: actions/upload-artifact@v3
+      with:
+        name: gitleaks-results
+        path: gitleaks-results.sarif
 
     - name: 🧽 Dockerfile Best Practices with Dockle
       run: |
