@@ -1,0 +1,99 @@
+name: DevSecOps CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
+
+jobs:
+
+  security-scan:
+    name: 🛡️ Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 🧾 Checkout Code
+      uses: actions/checkout@v3
+
+    - name: 🔍 Lint Dockerfile (Hadolint)
+      uses: hadolint/hadolint-action@v2.0.0
+      with:
+        dockerfile: ./server/Dockerfile
+
+    - name: 🔐 Secret Scan with Gitleaks
+      uses: gitleaks/gitleaks-action@v2.3.2
+
+    - name: 🧽 Dockerfile Best Practices with Dockle
+      run: |
+        docker pull goodwithtech/dockle
+        docker run --rm -v ${{ github.workspace }}:/app goodwithtech/dockle -f json -c CIS-DI-1.0 -i CIS-DI-1.0-5 /app/server
+
+    - name: 🔍 Vulnerability Scan with Trivy
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'my_custom_api:latest'
+        format: 'table'
+        exit-code: '1'
+        severity: 'CRITICAL,HIGH'
+
+  build:
+    name: 🛠️ Build & Test Docker Images
+    runs-on: ubuntu-latest
+    needs: security-scan
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build Docker Images
+      run: docker compose -f ./docker-compose.yml build
+
+  dockerhub-push:
+    name: 📦 Push to DockerHub
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Login to DockerHub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Build & Push Image
+      run: |
+        docker build -t $IMAGE_NAME:latest ./server
+        docker push $IMAGE_NAME:latest
+
+  zap-scan:
+    name: 🔥 OWASP ZAP DAST Scan
+    runs-on: ubuntu-latest
+    needs: dockerhub-push
+
+    steps:
+    - name: Run ZAP Baseline Scan
+      uses: zaproxy/action-baseline@v0.9.0
+      with:
+        target: 'http://your-public-frontend-url.com'
+        rules_file_name: '.zap-rules.tsv'
+
+  slack-alert:
+    name: 🔔 Slack Alert on Failure
+    runs-on: ubuntu-latest
+    if: failure()
+
+    steps:
+    - name: Notify Slack
+      run: |
+        curl -X POST -H 'Content-type: application/json' \
+        --data '{"text":"🚨 CI/CD Pipeline failed for CourseSellingWebsite!"}' \
+        ${{ secrets.SLACK_WEBHOOK_URL }}
