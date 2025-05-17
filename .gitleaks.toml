@@ -1,0 +1,8 @@
+[[rules]]
+description = "Exclude Vite Temp"
+regex = '''(?i)(client\/\.vite.*?)'''
+tags = ["excluded"]
+
+[[allowlist]]
+description = "Exclude .vite"
+path = "client/.vite/*"
