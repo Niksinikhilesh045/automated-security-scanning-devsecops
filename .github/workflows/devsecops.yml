@@ -26,9 +26,10 @@ jobs:
       with:
         dockerfile: ./server/Dockerfile
 
-    - name: 🔐 Secret Scan with Gitleaks
+    - name: 🔐 Secret Scan with Gitleaks (exclude .vite)
       uses: gitleaks/gitleaks-action@v2.3.2
       with:
+        config: .gitleaks.toml          # <-- Added config option here
         report-format: sarif
         report-path: gitleaks-results.sarif
 
