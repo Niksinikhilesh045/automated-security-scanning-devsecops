@@ -44,9 +44,11 @@ jobs:
         path: gitleaks-results.sarif
 
     - name: Upload SARIF file to GitHub Code Scanning
-      uses: github/codeql-action/upload-sarif@v2
+      uses: github/codeql-action/upload-sarif@v3.28.18
       with:
         sarif_file: gitleaks-results.sarif
+        token: ${{ secrets.GITHUB_TOKEN }}
+        wait-for-processing: true
 
     - name: 🧽 Dockerfile Best Practices with Dockle
       run: |
