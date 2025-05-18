@@ -1,8 +1,110 @@
+# =========================
+# Gitleaks Config (Combined)
+# =========================
+title = "gitleaks config"
+
+[[allowlist]]
+description = "Exclude .vite"
+paths = ["client/.vite/*"]
+
 [[rules]]
+id = "exclude-vite-temp"
 description = "Exclude Vite Temp"
 regex = '''(?i)(client\/\.vite.*?)'''
 tags = ["excluded"]
 
+# =========================
+# Global allowlists
+# =========================
 [[allowlist]]
-description = "Exclude .vite"
-path = "client/.vite/*"
+description = "global allow lists"
+paths = [
+    '''gitleaks\.toml''',
+    '''(?i)\.(?:bmp|gif|jpe?g|png|svg|tiff?)$''',
+    '''(?i)\.(?:eot|[ot]tf|woff2?)$''',
+    '''(?i)\.(?:docx?|xlsx?|pdf|bin|socket|vsidx|v2|suo|wsuo|.dll|pdb|exe|gltf|zip)$''',
+    '''go\.(?:mod|sum|work(?:\.sum)?)$''',
+    '''(?:^|/)vendor/modules\.txt$''',
+    '''(?:^|/)vendor/(?:github\.com|golang\.org/x|google\.golang\.org|gopkg\.in|istio\.io|k8s\.io|sigs\.k8s\.io)(?:/.*)?$''',
+    '''(?:^|/)gradlew(?:\.bat)?$''',
+    '''(?:^|/)gradle\.lockfile$''',
+    '''(?:^|/)mvnw(?:\.cmd)?$''',
+    '''(?:^|/)\.mvn/wrapper/MavenWrapperDownloader\.java$''',
+    '''(?:^|/)node_modules(?:/.*)?$''',
+    '''(?:^|/)(?:deno\.lock|npm-shrinkwrap\.json|package-lock\.json|pnpm-lock\.yaml|yarn\.lock)$''',
+    '''(?:^|/)bower_components(?:/.*)?$''',
+    '''(?:^|/)(?:angular|bootstrap|jquery(?:-?ui)?|plotly|swagger-?ui)[a-zA-Z0-9.-]*(?:\.min)?\.js(?:\.map)?$''',
+    '''(?:^|/)javascript\.json$''',
+    '''(?:^|/)(?:Pipfile|poetry)\.lock$''',
+    '''(?i)(?:^|/)(?:v?env|virtualenv)/lib(?:64)?(?:/.*)?$''',
+    '''(?i)(?:^|/)(?:lib(?:64)?/python[23](?:\.\d{1,2})+|python/[23](?:\.\d{1,2})+/lib(?:64)?)(?:/.*)?$''',
+    '''(?i)(?:^|/)[a-z0-9_.]+-[0-9.]+\.dist-info(?:/.+)?$''',
+    '''(?:^|/)vendor/(?:bundle|ruby)(?:/.*?)?$''',
+    '''\.gem$''',
+    '''verification-metadata\.xml''',
+    '''Database.refactorlog''',
+]
+regexes = [
+    '''(?i)^true|false|null$''',
+    '''^(?i:a+|b+|c+|d+|e+|f+|g+|h+|i+|j+|k+|l+|m+|n+|o+|p+|q+|r+|s+|t+|u+|v+|w+|x+|y+|z+|\*+|\.+)$''',
+    '''^\$(?:\d+|{\d+})$''',
+    '''^\$(?:[A-Z_]+|[a-z_]+)$''',
+    '''^\${(?:[A-Z_]+|[a-z_]+)}$''',
+    '''^\{\{[ \t]*[\w ().|]+[ \t]*}}$''',
+    '''^\$\{\{[ \t]*(?:(?:env|github|secrets|vars)(?:\.[A-Za-z]\w+)+[\w "'&./=|]*)[ \t]*}}$''',
+    '''^%(?:[A-Z_]+|[a-z_]+)%$''',
+    '''^%[+\-# 0]?[bcdeEfFgGoOpqstTUvxX]$''',
+    '''^\{\d{0,2}}$''',
+    '''^@(?:[A-Z_]+|[a-z_]+)@$''',
+    '''^/Users/(?i)[a-z0-9]+/[\w .-/]+$''',
+    '''^/(?:bin|etc|home|opt|tmp|usr|var)/[\w ./-]+$''',
+]
+stopwords = [
+    "abcdefghijklmnopqrstuvwxyz",
+    "014df517-39d1-4453-b7b3-9930c563627c",
+]
+
+# =========================
+# Default Gitleaks Rules
+# =========================
+[[rules]]
+id = "1password-secret-key"
+description = "Uncovered a possible 1Password secret key, potentially compromising access to secrets in vaults."
+regex = '''\bA3-[A-Z0-9]{6}-(?:(?:[A-Z0-9]{11})|(?:[A-Z0-9]{6}-[A-Z0-9]{5}))-[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}\b'''
+entropy = 3.8
+keywords = ["a3-"]
+
+[[rules]]
+id = "1password-service-account-token"
+description = "Uncovered a possible 1Password service account token, potentially compromising access to secrets in vaults."
+regex = '''ops_eyJ[a-zA-Z0-9+/]{250,}={0,3}'''
+entropy = 4
+keywords = ["ops_"]
+
+[[rules]]
+id = "adafruit-api-key"
+description = "Identified a potential Adafruit API Key, which could lead to unauthorized access to Adafruit services and sensitive data exposure."
+regex = '''(?i)[\w.-]{0,50}?(?:adafruit)(?:[ \t\w.-]{0,20})[\s'"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60'"\s=]{0,5}([a-z0-9_-]{32})(?:[\x60'"\s;]|\\[nr]|$)'''
+keywords = ["adafruit"]
+
+[[rules]]
+id = "adobe-client-id"
+description = "Detected a pattern that resembles an Adobe OAuth Web Client ID, posing a risk of compromised Adobe integrations and data breaches."
+regex = '''(?i)[\w.-]{0,50}?(?:adobe)(?:[ \t\w.-]{0,20})[\s'"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60'"\s=]{0,5}([a-f0-9]{32})(?:[\x60'"\s;]|\\[nr]|$)'''
+entropy = 2
+keywords = ["adobe"]
+
+[[rules]]
+id = "adobe-client-secret"
+description = "Discovered a potential Adobe Client Secret, which, if exposed, could allow unauthorized Adobe service access and data manipulation."
+regex = '''\b(p8e-(?i)[a-z0-9]{32})(?:[\x60'"\s;]|\\[nr]|$)'''
+entropy = 2
+keywords = ["p8e-"]
+
+[[rules]]
+id = "age-secret-key"
+description = "Discovered a potential Age encryption tool secret key, risking data decryption and unauthorized access to sensitive information."
+regex = '''AGE-SECRET-KEY-1[QPZRY9X8GF2TVDW0S3JN54KHCE6MUA7L]{58}'''
+keywords = ["age-secret-key-1"]
+
+# (You can include more default rules below if needed.)
