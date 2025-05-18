@@ -26,6 +26,41 @@ jobs:
       with:
         dockerfile: ./server/Dockerfile
 
+    - name: 🔍 Lint JavaScript with ESLint
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'  # use node LTS
+    - run: npm install eslint
+    - run: npx eslint './**/*.js' --format json --output-file eslint-report.json || true
+
+    - name: Comment ESLint results on PR
+      if: github.event_name == 'pull_request'
+      uses: peter-evans/create-or-update-comment@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        issue-number: ${{ github.event.pull_request.number }}
+        body: |
+          ### ESLint Results Summary
+          ${{ steps.eslint-summary.outputs.comment }}
+
+    - name: Generate ESLint summary
+      id: eslint-summary
+      run: |
+        jq -r '
+          if length == 0 then
+            "✅ No ESLint errors or warnings found."
+          else
+            ("⚠️ ESLint found " + (map(.messages | length) | add | tostring) + " issues.") 
+          end
+        ' eslint-report.json > eslint-summary.txt
+      shell: bash
+
+    - name: Upload ESLint Report Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: eslint-report
+        path: eslint-report.json
+
     - name: 🔐 Secret Scan with Gitleaks (exclude .vite)
       run: |
         curl -sSL https://github.com/zricethezav/gitleaks/releases/download/v8.12.0/gitleaks_8.12.0_linux_x64.tar.gz | tar -xz -C /tmp
@@ -37,6 +72,19 @@ jobs:
           --report-path gitleaks-results.sarif \
           --exit-code 0
 
+    - name: 🔧 Remove duplicate rules from SARIF
+      run: |
+          python3 -c "
+          import json
+          with open('gitleaks-results.sarif', 'r') as f:
+              sarif = json.load(f)
+          rules = sarif['runs'][0]['tool']['driver']['rules']
+          unique_rules = {r['id']: r for r in rules}.values()
+          sarif['runs'][0]['tool']['driver']['rules'] = list(unique_rules)
+          with open('gitleaks-results.sarif', 'w') as f:
+              json.dump(sarif, f, indent=2)
+          "
+
     - name: Upload Gitleaks report
       uses: actions/upload-artifact@v4.6.2
       with:
@@ -47,7 +95,7 @@ jobs:
       uses: github/codeql-action/upload-sarif@v3.28.18
       with:
         sarif_file: gitleaks-results.sarif
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.TOKEN }}
         wait-for-processing: true
 
     - name: 🧽 Dockerfile Best Practices with Dockle
