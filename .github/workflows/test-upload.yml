@@ -1,0 +1,17 @@
+name: Test Upload Artifact
+
+on: [push]
+
+jobs:
+  test-upload:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Create a test file
+      run: echo "test file content" > testfile.txt
+
+    - name: Upload test artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-artifact
+        path: testfile.txt
