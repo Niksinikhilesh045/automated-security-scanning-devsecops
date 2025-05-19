@@ -29,19 +29,9 @@ jobs:
     - name: 🔍 Lint JavaScript with ESLint
       uses: actions/setup-node@v3
       with:
-        node-version: '16'  # use node LTS
-    - run: npm install eslint
-    - run: npx eslint './**/*.js' --format json --output-file eslint-report.json || true
-
-    - name: Comment ESLint results on PR
-      if: github.event_name == 'pull_request'
-      uses: peter-evans/create-or-update-comment@v4
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        issue-number: ${{ github.event.pull_request.number }}
-        body: |
-          ### ESLint Results Summary
-          ${{ steps.eslint-summary.outputs.comment }}
+        node-version: '16'
+    - run: npm ci
+    - run: npx eslint './**/*.js' --config eslint.config.js --format json --output-file eslint-report.json || true
 
     - name: Generate ESLint summary
       id: eslint-summary
@@ -54,6 +44,16 @@ jobs:
           end
         ' eslint-report.json > eslint-summary.txt
       shell: bash
+
+    - name: Comment ESLint results on PR
+      if: github.event_name == 'pull_request'
+      uses: peter-evans/create-or-update-comment@v4
+      with:
+        token: ${{ secrets.TOKEN }}
+        issue-number: ${{ github.event.pull_request.number }}
+        body: |
+          ### ESLint Results Summary
+          ${{ steps.eslint-summary.outputs.comment }}
 
     - name: Upload ESLint Report Artifact
       uses: actions/upload-artifact@v4
