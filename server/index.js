@@ -27,5 +27,5 @@ app.use("/users", userRouter);
 app.use("/admin", adminRouter);
 
 app.get("/", (req, res) => {
-  res.send("Hello World from Nikhilesh's PC! I love you Nivvu!");
+  res.send("Hello World from Nikhilesh's PC!");
 })
