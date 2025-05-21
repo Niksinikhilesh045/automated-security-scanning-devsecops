@@ -102,6 +102,15 @@ jobs:
         token: ${{ github.token }}
         wait-for-processing: true
 
+    - name: 🧽 Dockerfile Best Practices with Dockle
+      run: |
+        docker pull goodwithtech/dockle
+        docker run --rm -v ${{ github.workspace }}:/app goodwithtech/dockle \
+        --format json \
+        --exit-code 1 \
+        --exit-level WARN \
+        ${{ secrets.IMAGE_NAME }}
+
     - name: 🔍 Vulnerability Scan with Trivy
       uses: aquasecurity/trivy-action@master
       with:
@@ -129,15 +138,6 @@ jobs:
 
     - name: Build Docker Images
       run: docker compose -f ./docker-compose.yml build
-
-    - name: 🧽 Dockerfile Best Practices with Dockle
-      run: |
-        docker pull goodwithtech/dockle
-        docker run --rm -v ${{ github.workspace }}:/app goodwithtech/dockle \
-        --format json \
-        --exit-code 1 \
-        --exit-level WARN \
-        ${{ env.IMAGE_NAME }}
       
   dockerhub-push:
     name: 📦 Push to DockerHub
@@ -155,8 +155,11 @@ jobs:
 
     - name: Build & Push Image
       run: |
-        docker build -t $IMAGE_NAME:latest ./server
-        docker push $IMAGE_NAME:latest
+          docker build \
+            --build-arg DB_KEY=${{ secrets.DB_KEY }} \
+            --build-arg DB_URL=${{ secrets.DB_URL }} \
+            -t ${{ secrets.IMAGE_NAME }}:latest ./server
+          docker push ${{ secrets.IMAGE_NAME }}:latest
 
   zap-scan:
     name: 🔥 OWASP ZAP DAST Scan
