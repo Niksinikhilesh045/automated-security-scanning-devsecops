@@ -106,7 +106,7 @@ jobs:
       uses: docker/setup-buildx-action@v3
 
     - name: 🛠️ Build Docker Image for Local Scan
-      run: docker build -t ${{ secrets.IMAGE_NAME }} --load ./server
+      run: docker buildx build -t ${{ secrets.IMAGE_NAME }} --load ./server
 
     - name: 🧽 Dockerfile Best Practices with Dockle
       run: |
