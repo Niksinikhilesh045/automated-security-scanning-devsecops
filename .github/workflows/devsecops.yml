@@ -102,6 +102,9 @@ jobs:
         token: ${{ github.token }}
         wait-for-processing: true
 
+    - name: 🛠️ Build Docker Image for Local Scan
+      run: docker build -t ${{ secrets.IMAGE_NAME }} ./server
+
     - name: 🧽 Dockerfile Best Practices with Dockle
       run: |
         docker pull goodwithtech/dockle
