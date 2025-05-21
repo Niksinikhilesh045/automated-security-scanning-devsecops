@@ -105,7 +105,10 @@ jobs:
     - name: 🧽 Dockerfile Best Practices with Dockle
       run: |
         docker pull goodwithtech/dockle
-        docker run --rm -v ${{ github.workspace }}:/app goodwithtech/dockle -f json -c CIS-DI-1.0 -i CIS-DI-1.0-5 /app/server
+        docker run --rm -v ${{ github.workspace }}:/app goodwithtech/dockle \
+        --format json \
+        -i CIS-DI-1.0-5 \
+        /app/server
 
     - name: 🔍 Vulnerability Scan with Trivy
       uses: aquasecurity/trivy-action@master
