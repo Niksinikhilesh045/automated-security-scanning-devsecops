@@ -114,8 +114,8 @@ jobs:
         --exit-level WARN \
         ${{ secrets.IMAGE_NAME }}
 
-    #- name: ⚙️ Set up Docker Buildx  # ✅ ADD THIS STEP
-    #  uses: docker/setup-buildx-action@v3
+    - name: ⚙️ Set up Docker Buildx  # ✅ ADD THIS STEP
+      uses: docker/setup-buildx-action@v3
 
     - name: 🔍 Vulnerability Scan with Trivy
       uses: aquasecurity/trivy-action@0.30.0
