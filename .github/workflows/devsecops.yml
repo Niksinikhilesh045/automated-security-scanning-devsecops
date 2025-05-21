@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+  security-events: write
+
 env:
   IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
   DB_KEY: ${{ secrets.DB_KEY }}
@@ -49,7 +53,7 @@ jobs:
       if: github.event_name == 'pull_request'
       uses: peter-evans/create-or-update-comment@v4
       with:
-        token: ${{ secrets.GH_PAT }}
+        token: ${{ github.token }}
         issue-number: ${{ github.event.pull_request.number }}
         body: |
           ### ESLint Results Summary
@@ -95,7 +99,7 @@ jobs:
       uses: github/codeql-action/upload-sarif@v3.28.18
       with:
         sarif_file: gitleaks-results.sarif
-        token: ${{ secrets.GH_PAT }}
+        token: ${{ github.token }}
         wait-for-processing: true
 
     - name: 🧽 Dockerfile Best Practices with Dockle
