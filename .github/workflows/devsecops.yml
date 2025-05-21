@@ -107,6 +107,8 @@ jobs:
         docker pull goodwithtech/dockle
         docker run --rm -v ${{ github.workspace }}:/app goodwithtech/dockle \
         --format json \
+        --exit-code 1 \
+        --exit-level WARN \
         -i CIS-DI-1.0-5 \
         /app/server
 
