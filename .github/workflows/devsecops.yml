@@ -109,8 +109,7 @@ jobs:
         --format json \
         --exit-code 1 \
         --exit-level WARN \
-        -i CIS-DI-1.0-5 \
-        /app/server
+        ${{ env.IMAGE_NAME }}
 
     - name: 🔍 Vulnerability Scan with Trivy
       uses: aquasecurity/trivy-action@master
