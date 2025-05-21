@@ -117,7 +117,7 @@ jobs:
     - name: 🔍 Vulnerability Scan with Trivy
       uses: aquasecurity/trivy-action@master
       with:
-        image-ref: 'my_custom_api:latest'
+        image-ref: '${{ secrets.IMAGE_NAME }}:latest'
         format: 'table'
         exit-code: '1'
         severity: 'CRITICAL,HIGH'
