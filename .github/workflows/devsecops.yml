@@ -111,7 +111,7 @@ jobs:
         ls -la ./server
 
     - name: 🛠️ Build Docker Image for Local Scan
-      run: docker buildx build -t ${{ secrets.IMAGE_NAME }} ./server
+      run: docker buildx build --load -t ${{ secrets.IMAGE_NAME }} ./server
 
     - name: 🧽 Dockerfile Best Practices with Dockle
       run: |
