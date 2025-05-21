@@ -102,15 +102,6 @@ jobs:
         token: ${{ github.token }}
         wait-for-processing: true
 
-    - name: 🧽 Dockerfile Best Practices with Dockle
-      run: |
-        docker pull goodwithtech/dockle
-        docker run --rm -v ${{ github.workspace }}:/app goodwithtech/dockle \
-        --format json \
-        --exit-code 1 \
-        --exit-level WARN \
-        ${{ env.IMAGE_NAME }}
-
     - name: 🔍 Vulnerability Scan with Trivy
       uses: aquasecurity/trivy-action@master
       with:
@@ -139,6 +130,15 @@ jobs:
     - name: Build Docker Images
       run: docker compose -f ./docker-compose.yml build
 
+    - name: 🧽 Dockerfile Best Practices with Dockle
+      run: |
+        docker pull goodwithtech/dockle
+        docker run --rm -v ${{ github.workspace }}:/app goodwithtech/dockle \
+        --format json \
+        --exit-code 1 \
+        --exit-level WARN \
+        ${{ env.IMAGE_NAME }}
+      
   dockerhub-push:
     name: 📦 Push to DockerHub
     runs-on: ubuntu-latest
