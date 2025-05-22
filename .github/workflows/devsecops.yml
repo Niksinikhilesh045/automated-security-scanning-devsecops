@@ -110,6 +110,10 @@ jobs:
         ls -la
         ls -la ./server
 
+    - name: 🐞 Debug Image Name
+      run: |
+        echo "IMAGE_NAME is: ${{ secrets.IMAGE_NAME }}"
+
     - name: 🛠️ Build Docker Image for Local Scan
       run: docker buildx build --load -t ${{ secrets.IMAGE_NAME }} ./server
 
