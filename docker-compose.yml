@@ -10,8 +10,8 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-      - DB_KEY=${DB_KEY:-S3cr3tIsThisYouKnowna}
-      - DB_URL=${DB_URL:-mongodb+srv://harsh:harsh123@cluster0.poozi.mongodb.net/course_selling_app}
+      - DB_KEY=${DB_KEY}
+      - DB_URL=${DB_URL}
     restart: unless-stopped
 
   client:
