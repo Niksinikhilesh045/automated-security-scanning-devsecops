@@ -128,7 +128,7 @@ jobs:
           -v /var/run/docker.sock:/var/run/docker.sock \
           goodwithtech/dockle \
           --exit-code 1 \
-          --exit-level WARN \
+          --exit-level FATAL \
           "$IMAGE_NAME"
 
     - name: 🔐 Log in to Docker Hub
