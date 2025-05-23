@@ -124,10 +124,12 @@ jobs:
         IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
       run: |
         docker pull goodwithtech/dockle
-        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock goodwithtech/dockle \
-        --exit-code 1 \
-        --exit-level WARN \
-        --input "$IMAGE_NAME"
+        docker run --rm \
+          -v /var/run/docker.sock:/var/run/docker.sock \
+          goodwithtech/dockle \
+          --exit-code 1 \
+          --exit-level WARN \
+          "$IMAGE_NAME"
 
     - name: 🔐 Log in to Docker Hub
       run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
