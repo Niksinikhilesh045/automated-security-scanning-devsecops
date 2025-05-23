@@ -115,7 +115,9 @@ jobs:
         echo "IMAGE_NAME is: ${{ secrets.IMAGE_NAME }}"
 
     - name: 🛠️ Build Docker Image for Local Scan
-      run: docker buildx build --load -t ${{ secrets.IMAGE_NAME }} ./server
+      env:
+        IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
+      run: docker buildx build --load -t $IMAGE_NAME ./server
 
     - name: 🧽 Dockerfile Best Practices with Dockle
       run: |
