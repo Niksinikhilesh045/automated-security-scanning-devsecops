@@ -144,10 +144,11 @@ jobs:
     - name: 🔍 Vulnerability Scan with Trivy
       uses: aquasecurity/trivy-action@0.30.0
       with:
-        image-ref: '${{ secrets.IMAGE_NAME }}:latest'
+        image-ref: 'nikhileshsingh/automated-security-scanning-devsecops:latest'   # Replace with your image name
         format: 'table'
         exit-code: '1'
         severity: 'CRITICAL,HIGH'
+
 
   build:
     name: 🛠️ Build & Test Docker Images
