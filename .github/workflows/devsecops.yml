@@ -11,7 +11,7 @@ permissions:
   security-events: write
 
 env:
-  IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
+  IMAGE_NAME: nikhileshsingh/automated-security-scanning-devsecops:latest
   DB_KEY: ${{ secrets.DB_KEY }}
   DB_URL: ${{ secrets.DB_URL }}
 
@@ -102,7 +102,7 @@ jobs:
         token: ${{ github.token }}
         wait-for-processing: true
 
-    - name: ⚙️ Set up Docker Buildx  
+    - name: ⚙️ Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
     - name: 🔍 Debug Context
@@ -110,20 +110,13 @@ jobs:
         ls -la
         ls -la ./server
 
-    - name: 🐞 Debug Image Name
-      env:
-        IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
-      run: |
-        echo "IMAGE_NAME is: ${IMAGE_NAME}"
+    - name: 🔞 Debug Image Name
+      run: echo "IMAGE_NAME is: $IMAGE_NAME"
 
     - name: 🛠️ Build Docker Image for Local Scan
-      env:
-        IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
       run: docker buildx build --load -t $IMAGE_NAME ./server
 
     - name: 🧽 Dockerfile Best Practices with Dockle
-      env:
-        IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
       run: |
         docker pull goodwithtech/dockle
         docker run --rm \
@@ -137,18 +130,15 @@ jobs:
       run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
     - name: 📦 Push Docker Image to Docker Hub
-      env:
-        IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
       run: docker push "$IMAGE_NAME"
 
     - name: 🔍 Vulnerability Scan with Trivy
       uses: aquasecurity/trivy-action@0.30.0
       with:
-        image-ref: 'nikhileshsingh/automated-security-scanning-devsecops:latest'   # Replace with your image name
+        image-ref: ${{ env.IMAGE_NAME }}
         format: 'table'
         exit-code: '1'
         severity: 'CRITICAL,HIGH'
-
 
   build:
     name: 🛠️ Build & Test Docker Images
@@ -169,7 +159,7 @@ jobs:
 
     - name: Build Docker Images
       run: docker compose -f ./docker-compose.yml build
-      
+
   dockerhub-push:
     name: 📦 Push to DockerHub
     runs-on: ubuntu-latest
@@ -193,10 +183,10 @@ jobs:
         docker build \
           --build-arg DB_KEY=${{ secrets.DB_KEY }} \
           --build-arg DB_URL=${{ secrets.DB_URL }} \
-          -t ${{ secrets.IMAGE_NAME }}:latest \
-          -t ${{ secrets.IMAGE_NAME }}:$TAG ./server
-        docker push ${{ secrets.IMAGE_NAME }}:latest
-        docker push ${{ secrets.IMAGE_NAME }}:$TAG
+          -t ${{ env.IMAGE_NAME }}:latest \
+          -t ${{ env.IMAGE_NAME }}:$TAG ./server
+        docker push ${{ env.IMAGE_NAME }}:latest
+        docker push ${{ env.IMAGE_NAME }}:$TAG
 
   zap-scan:
     name: 🔥 OWASP ZAP DAST Scan
