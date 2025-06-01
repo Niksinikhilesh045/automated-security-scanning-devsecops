@@ -111,8 +111,10 @@ jobs:
         ls -la ./server
 
     - name: 🐞 Debug Image Name
+      env:
+        IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
       run: |
-        echo "IMAGE_NAME is: ${{ secrets.IMAGE_NAME }}"
+        echo "IMAGE_NAME is: ${IMAGE_NAME}"
 
     - name: 🛠️ Build Docker Image for Local Scan
       env:
