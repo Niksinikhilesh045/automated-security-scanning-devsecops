@@ -105,13 +105,16 @@ jobs:
     - name: ⚙️ Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
+    - name: 🐞 Debug Image Name
+      run: |
+        echo "IMAGE_NAME is: $IMAGE_NAME"
+      env:
+        IMAGE_NAME: ${{ env.IMAGE_NAME }}
+
     - name: 🔍 Debug Context
       run: |
         ls -la
         ls -la ./server
-
-    - name: 🔞 Debug Image Name
-      run: echo "IMAGE_NAME is: $IMAGE_NAME"
 
     - name: 🛠️ Build Docker Image for Local Scan
       run: docker buildx build --load -t $IMAGE_NAME ./server
