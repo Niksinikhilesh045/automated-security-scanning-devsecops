@@ -1,4 +1,12 @@
-node_modules
-".vite/" 
-"client/.vite*" 
+# Ignore node modules
+node_modules/
+
+# Ignore environment files
 .env
+
+# Ignore Vite cache folders
+.vite/
+client/.vite/
+
+# Ignore Gitleaks results
+gitleaks-results.sarif
