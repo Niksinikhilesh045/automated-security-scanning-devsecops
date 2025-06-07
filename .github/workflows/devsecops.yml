@@ -35,7 +35,9 @@ jobs:
       with:
         node-version: '24.0.2'
     - run: npm ci
+      working-directory: ./server
     - run: npx eslint './**/*.js' --config eslint.config.js --format json --output-file eslint-report.json || true
+      working-directory: ./server
 
     - name: Generate ESLint summary
       id: eslint-summary
