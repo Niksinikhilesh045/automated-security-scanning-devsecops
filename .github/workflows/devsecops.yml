@@ -39,8 +39,12 @@ jobs:
     - run: npx eslint './**/*.js' --config eslint.config.js --format json --output-file eslint-report.json || true
       working-directory: ./server
 
+    - name: 🔎 List JS Files for Debug
+      run: find ./server -name "*.js"
+
     - name: Generate ESLint summary
       id: eslint-summary
+      if: success() && hashFiles('server/eslint-report.json') != ''
       run: |
         jq -r '
           if length == 0 then
@@ -48,8 +52,12 @@ jobs:
           else
             ("⚠️ ESLint found " + (map(.messages | length) | add | tostring) + " issues.") 
           end
-        ' eslint-report.json > eslint-summary.txt
+        ' server/eslint-report.json > server/eslint-summary.txt
       shell: bash
+
+    - name: Fallback ESLint summary if no report
+      if: hashFiles('server/eslint-report.json') == ''
+      run: echo "⚠️ ESLint did not produce a report file. Check if JS files exist or ESLint ran correctly."
 
     - name: Comment ESLint results on PR
       if: github.event_name == 'pull_request'
