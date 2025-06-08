@@ -215,14 +215,36 @@ jobs:
     needs: dockerhub-push
 
     steps:
-      - name: Run ZAP Baseline Scan
-        uses: zaproxy/action-baseline@v0.9.0
-        with:
-          target: 'http://localhost:8080'  # Replace with actual frontend URL
-          fail_action: false
-          allow_issue_writing: true
-          artifact_name: zap_scan
-          issue_title: ZAP Scan Baseline Report
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: ⚙️ Set up Docker
+      uses: docker/setup-buildx-action@v3
+
+    - name: 🚀 Start Frontend Container
+      run: docker compose up -d client
+
+    - name: 🕒 Wait for Frontend to Be Ready
+      run: |
+        for i in {1..10}; do
+          if curl -s http://localhost:8080 > /dev/null; then
+            echo "Frontend is up!"
+            exit 0
+          fi
+          echo "Waiting for frontend..."
+          sleep 5
+        done
+        echo "Frontend did not start in time." >&2
+        exit 1
+
+    - name: 🔥 Run ZAP Baseline Scan
+      uses: zaproxy/action-baseline@v0.9.0
+      with:
+        target: 'http://localhost:8080'
+        fail_action: false
+        allow_issue_writing: true
+        artifact_name: zap_scan
+        issue_title: ZAP Scan Baseline Report
 
   slack-alert:
     name: 🔔 Slack Alert on Failure
