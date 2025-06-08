@@ -196,13 +196,18 @@ jobs:
     - name: Build & Push Image
       run: |
         TAG=$(git rev-parse --short HEAD)
+    
+        # Strip the tag from the image name
+        IMAGE_BASE="${IMAGE_NAME%:*}"
+
         docker build \
           --build-arg DB_KEY=${{ secrets.DB_KEY }} \
           --build-arg DB_URL=${{ secrets.DB_URL }} \
-          -t ${{ env.IMAGE_NAME }}:latest \
-          -t ${{ env.IMAGE_NAME }}:$TAG ./server
-        docker push ${{ env.IMAGE_NAME }}:latest
-        docker push ${{ env.IMAGE_NAME }}:$TAG
+          -t "$IMAGE_BASE:latest" \
+          -t "$IMAGE_BASE:$TAG" ./server
+
+        docker push "$IMAGE_BASE:latest"
+        docker push "$IMAGE_BASE:$TAG"
 
   zap-scan:
     name: 🔥 OWASP ZAP DAST Scan
