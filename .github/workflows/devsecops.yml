@@ -215,11 +215,14 @@ jobs:
     needs: dockerhub-push
 
     steps:
-    - name: Run ZAP Baseline Scan
-      uses: zaproxy/action-baseline@v0.9.0
-      with:
-        target: 'http://your-public-frontend-url.com'
-        rules_file_name: '.zap-rules.tsv'
+      - name: Run ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.9.0
+        with:
+          target: 'http://localhost:8080'  # Replace with actual frontend URL
+          fail_action: false
+          allow_issue_writing: true
+          artifact_name: zap_scan
+          issue_title: ZAP Scan Baseline Report
 
   slack-alert:
     name: 🔔 Slack Alert on Failure
