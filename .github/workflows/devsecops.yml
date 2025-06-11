@@ -254,7 +254,7 @@ jobs:
         target: 'http://localhost:8080'
         fail_action: false
         allow_issue_writing: true
-        artifact_name: zapreports
+        # artifact_name: zapreports
         issue_title: ZAP Scan Baseline Report
         docker_name: ghcr.io/zaproxy/zaproxy:stable
         token: ${{ github.token }} # ADDED THIS LINE - CRITICAL for issue creation and artifact upload from the ZAP action itself
@@ -262,7 +262,7 @@ jobs:
     - name: 📦 Upload ZAP Reports
       uses: actions/upload-artifact@v4
       with:
-        name: code-coverage-report
+        name: zap-raw-reports
         path: |
           report_json.json
           report_md.md
