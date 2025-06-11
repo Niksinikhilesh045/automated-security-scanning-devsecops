@@ -270,13 +270,24 @@ jobs:
           report_html.html
 
   slack-alert:
-    name: 🔔 Slack Alert on Failure
+    name: 🔔 Slack Alert
     runs-on: ubuntu-latest
-    if: failure()
+    # This job will now run regardless of whether previous jobs succeeded or failed
+    if: always() # <--- Change the condition to always()
+    needs: security-scan # <--- Add this line to explicitly depend on security-scan
 
     steps:
-    - name: Notify Slack
-      run: |
-        curl -X POST -H 'Content-type: application/json' \
-        --data '{"text":"🚨 CI/CD Pipeline failed for CourseSellingWebsite!"}' \
-        ${{ secrets.SLACK_WEBHOOK_URL }}
+      - name: Get security-scan job status
+        id: job_status
+        run: |
+          # Get the conclusion of the 'security-scan' job
+          SECURITY_SCAN_CONCLUSION="${{ needs.security-scan.result }}"
+          echo "security_scan_conclusion=$SECURITY_SCAN_CONCLUSION" >> "$GITHUB_OUTPUT"
+          
+      - name: Notify Slack
+        # This step will only run if the 'security-scan' job was not 'success'
+        if: ${{ steps.job_status.outputs.security_scan_conclusion != 'success' }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data '{"text":"🚨 CI/CD Pipeline has non-success status for CourseSellingWebsite (security-scan job was ${{ steps.job_status.outputs.security_scan_conclusion }})!"}' \
+          ${{ secrets.SLACK_WEBHOOK_URL }}
