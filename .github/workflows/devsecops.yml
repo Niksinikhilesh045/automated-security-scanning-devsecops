@@ -43,13 +43,9 @@ jobs:
     - name: Run ESLint and capture output
       run: |
         # Run ESLint, allowing it to fail, but capture its exit code
-        npx eslint './**/*.js' --config eslint.config.js --format json --output-file eslint-report.json
+        npx eslint './**/*.js' --config ../eslint.config.js --format json --output-file eslint-report.json # <-- This is the corrected path
         ESLINT_EXIT_CODE=$?
         echo "ESLint command finished with exit code: $ESLINT_EXIT_CODE"
-        # If ESLint fails (exit code 1 or more), we still want to proceed to artifact upload
-        # but capture its state for debugging.
-        # This prevents the step from failing immediately if issues are found,
-        # but allows us to inspect the exit code.
         exit 0
       working-directory: ./server
 
