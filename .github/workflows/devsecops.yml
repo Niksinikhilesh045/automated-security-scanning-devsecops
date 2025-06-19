@@ -54,19 +54,20 @@ jobs:
 
     # --- Dependency Vulnerability Scanning with Snyk ---
     - name: Snyk Vulnerability Scan
-      uses: snyk/actions/node@master # Use the correct Snyk action for Node.js projects
+      uses: snyk/actions/node@master
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }} # Ensure this secret is configured in your repo
       with:
         # Scan all projects (package.json files), set severity threshold to medium
-        # Output results to a SARIF file for GitHub Code Scanning
-        args: --all-projects --severity-threshold=medium --json-file-output=snyk-results.json
+        # IMPORTANT: Use --sarif-file-output to generate a SARIF compliant report
+        args: --all-projects --severity-threshold=medium --sarif-file-output=snyk-results.sarif
+        command: test # Explicitly specify the 'test' command for dependency scanning
 
     - name: Upload Snyk results to Code Scanning
       if: always() # Ensure this runs even if Snyk finds issues and exits non-zero
-      uses: github/codeql-action/upload-sarif@v3 # Re-using the same SARIF upload action
+      uses: github/codeql-action/upload-sarif@v3
       with:
-        sarif_file: snyk-results.json
+        sarif_file: snyk-results.sarif # Ensure this matches the output filename from Snyk
         # 'category' helps differentiate results in Code Scanning UI if you have multiple SARIF uploads
         category: snyk-dependency-scan
 
