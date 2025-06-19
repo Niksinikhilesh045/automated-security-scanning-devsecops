@@ -273,13 +273,116 @@ jobs:
           report_html.html
 
   slack-alert:
-    name: 🔔 Slack Alert on Failure
+    name: 🔔 Slack Alert on Failure/Warnings
     runs-on: ubuntu-latest
-    if: failure()
+    if: always() # Ensure this job always runs
+    needs: [security-scan, zap-scan] # Depends on these jobs to get their results and artifacts
 
     steps:
-    - name: Notify Slack
+    - name: Get security-scan job status
+      id: security_status
+      run: echo "security_scan_conclusion=${{ needs.security-scan.result }}" >> "$GITHUB_OUTPUT"
+
+    - name: Get zap-scan job status
+      id: zap_status
+      run: echo "zap_scan_conclusion=${{ needs.zap-scan.result }}" >> "$GITHUB_OUTPUT"
+
+    - name: Download ESLint Report Artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: eslint-report
+        path: ./eslint-reports # Download to a specific directory
+      continue-on-error: true # Don't fail if artifact isn't found (e.g., no JS files, or previous step failed)
+
+    - name: Download ZAP Reports Artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: zap-raw-reports
+        path: ./zap-reports # Download to a specific directory
+      continue-on-error: true # Don't fail if artifact isn't found
+
+    - name: Process ESLint and ZAP Reports
+      id: report_summary
       run: |
+        ESLINT_SUMMARY=""
+        ZAP_SUMMARY=""
+        HAS_REPORT_ISSUES="false" # Flag to track if any issues were found in reports
+
+        # --- Process ESLint Report ---
+        if [ -f "./eslint-reports/eslint-report.json" ]; then
+          ESLINT_ISSUES=$(jq '[.[] | .messages | length] | add' ./eslint-reports/eslint-report.json)
+          if [ "$ESLINT_ISSUES" -gt 0 ]; then
+            ESLINT_SUMMARY=":warning: *ESLint Issues:* $ESLINT_ISSUES found.\n"
+            HAS_REPORT_ISSUES="true"
+          else
+            ESLINT_SUMMARY=":white_check_mark: *ESLint Issues:* None found.\n"
+          fi
+        else
+          ESLINT_SUMMARY=":warning: *ESLint Issues:* Report not found (possibly no JS files, or ESLint step issues).\n"
+        fi
+
+        # --- Process ZAP Report ---
+        # Note: ZAP riskcode: 3=High, 2=Medium, 1=Low, 0=Info
+        if [ -f "./zap-reports/report_json.json" ]; then
+          HIGH_ALERTS=$(jq '[.site[]?.alerts[]? | select(.riskcode == 3)] | length' ./zap-reports/report_json.json)
+          MEDIUM_ALERTS=$(jq '[.site[]?.alerts[]? | select(.riskcode == 2)] | length' ./zap-reports/report_json.json)
+          LOW_ALERTS=$(jq '[.site[]?.alerts[]? | select(.riskcode == 1)] | length' ./zap-reports/report_json.json)
+          INFO_ALERTS=$(jq '[.site[]?.alerts[]? | select(.riskcode == 0)] | length' ./zap-reports/report_json.json)
+          TOTAL_ALERTS=$((HIGH_ALERTS + MEDIUM_ALERTS + LOW_ALERTS + INFO_ALERTS))
+
+          if [ "$TOTAL_ALERTS" -gt 0 ]; then
+            ZAP_SUMMARY=":red_circle: *ZAP Scan Vulnerabilities:*\n"
+            if [ "$HIGH_ALERTS" -gt 0 ]; then ZAP_SUMMARY+="  - High: $HIGH_ALERTS\n"; HAS_REPORT_ISSUES="true"; fi
+            if [ "$MEDIUM_ALERTS" -gt 0 ]; then ZAP_SUMMARY+="  - Medium: $MEDIUM_ALERTS\n"; HAS_REPORT_ISSUES="true"; fi
+            if [ "$LOW_ALERTS" -gt 0 ]; then ZAP_SUMMARY+="  - Low: $LOW_ALERTS\n"; HAS_REPORT_ISSUES="true"; fi
+            if [ "$INFO_ALERTS" -gt 0 ]; then ZAP_SUMMARY+="  - Info: $INFO_ALERTS\n"; fi
+          else
+            ZAP_SUMMARY=":white_check_mark: *ZAP Scan Vulnerabilities:* None found.\n"
+          fi
+        else
+          ZAP_SUMMARY=":warning: *ZAP Scan Vulnerabilities:* Report not found.\n"
+        fi
+
+        # Set outputs for next step
+        echo "ESLINT_SUMMARY<<EOF" >> "$GITHUB_OUTPUT"
+        echo "$ESLINT_SUMMARY" >> "$GITHUB_OUTPUT"
+        echo "EOF" >> "$GITHUB_OUTPUT"
+
+        echo "ZAP_SUMMARY<<EOF" >> "$GITHUB_OUTPUT"
+        echo "$ZAP_SUMMARY" >> "$GITHUB_OUTPUT"
+        echo "EOF" >> "$GITHUB_OUTPUT"
+
+        echo "HAS_REPORT_ISSUES=$HAS_REPORT_ISSUES" >> "$GITHUB_OUTPUT"
+
+
+    - name: Notify Slack
+      # Trigger if any job failed OR if ESLint/ZAP reports show issues
+      if: |
+        ${{ steps.security_status.outputs.security_scan_conclusion != 'success' ||
+            steps.zap_status.outputs.zap_scan_conclusion != 'success' ||
+            steps.report_summary.outputs.HAS_REPORT_ISSUES == 'true' }}
+      run: |
+        ALERT_HEADER=""
+        # Determine the overall alert header based on job conclusions and report issues
+        if [ "${{ steps.security_status.outputs.security_scan_conclusion }}" != "success" ] || \
+           [ "${{ steps.zap_status.outputs.zap_scan_conclusion }}" != "success" ]; then
+          ALERT_HEADER=":rotating_light: *CI/CD Pipeline Failure/Error Detected!* :rotating_light:\n"
+        elif [ "${{ steps.report_summary.outputs.HAS_REPORT_ISSUES }}" == "true" ]; then
+          ALERT_HEADER=":warning: *CI/CD Pipeline Completed with Warnings/Vulnerabilities!* :warning:\n"
+        else
+          # This branch should theoretically not be hit due to the 'if' condition,
+          # but included for completeness if the condition logic changes.
+          ALERT_HEADER=":white_check_mark: *CI/CD Pipeline Completed Successfully!* :white_check_mark:\n"
+        fi
+
+        ALERT_MESSAGE="${ALERT_HEADER}\n"
+        ALERT_MESSAGE+="*Job Statuses:*\n"
+        ALERT_MESSAGE+="  - Security Scan: ${{ steps.security_status.outputs.security_scan_conclusion }}\n"
+        ALERT_MESSAGE+="  - ZAP Scan: ${{ steps.zap_status.outputs.zap_scan_conclusion }}\n\n"
+        ALERT_MESSAGE+="${{ steps.report_summary.outputs.ESLINT_SUMMARY }}"
+        ALERT_MESSAGE+="${{ steps.report_summary.outputs.ZAP_SUMMARY }}\n"
+        ALERT_MESSAGE+="*Workflow Run:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
         curl -X POST -H 'Content-type: application/json' \
-        --data '{"text":"🚨 CI/CD Pipeline failed for CourseSellingWebsite!"}' \
+        --data "{\"text\":\"$ALERT_MESSAGE\"}" \
         ${{ secrets.SLACK_WEBHOOK_URL }}
