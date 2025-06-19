@@ -50,26 +50,24 @@ jobs:
 
     - name: Run ESLint and capture output (DEBUGGING CRASH)
       run: |
-        # Set options for verbose debugging:
-        # -e: Exit immediately if a command exits with a non-zero status.
-        # -u: Treat unset variables as an error.
-        # -x: Print commands and their arguments as they are executed.
-        # -o pipefail: Ensure pipelines fail if any command in the pipe fails.
+        # Enable verbose debugging and fail on first error
         set -euxo pipefail
 
-        # Execute ESLint. Redirect stderr to stdout (2>&1) to capture all output.
+        echo "--- Debugging ESLint binary invocation ---"
+        echo "Attempting to run: npx eslint --version"
+        # Run a very basic ESLint command to check if the binary can be executed.
+        # Redirect stderr to stdout and ensure the shell exits if this fails.
+        npx eslint --version 2>&1
+        echo "ESLint --version command finished."
+        echo "--- End Debugging ESLint binary invocation ---"
+
+        echo "Attempting to run main ESLint command:"
         npx eslint './server/**/*.js' --config ./eslint.config.js --format json --output-file eslint-report.json 2>&1
-
-        # The following lines might not be reached if npx eslint crashes critically,
-        # but they are kept for cases where it provides an exit code without crashing the shell.
         ESLINT_EXIT_CODE=$?
-        echo "ESLint command finished with exit code: $ESLINT_EXIT_CODE"
+        echo "ESLint main command finished with exit code: $ESLINT_EXIT_CODE"
 
-        # IMPORTANT DEBUGGING NOTE:
-        # Currently, 'exit 0' is REMOVED to allow the true exit code of 'npx eslint' to propagate
+        # Temporarily REMOVED 'exit 0' to allow the true exit code of 'npx eslint' to propagate
         # and reveal the underlying error message in the logs.
-        # Once the error is identified and fixed, you should RE-ADD 'exit 0' HERE:
-        # exit 0
       # No 'working-directory' is set for this step, so it runs from the repo root
 
 
