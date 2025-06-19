@@ -48,17 +48,38 @@ jobs:
       with:
         dockerfile: ./server/Dockerfile
 
-    - name: Run ESLint and capture output
+    - name: Run ESLint and capture output (DEEPER DEBUGGING - CONFIG ONLY)
       run: |
-        # Re-enabling verbose debugging to catch critical failures
-        set -euxo pipefail
+        set -euxo pipefail # Enable verbose debugging and fail on first error
 
-        # Use 'json' format, which is supported by ESLint v9 without separate installation.
-        # Output to 'eslint-report.json' as originally intended.
-        npx eslint './server/**/*.js' --config ./eslint.config.js --format json --output-file eslint-report.json
-        ESLINT_EXIT_CODE=$?
-        echo "ESLint command finished with exit code: $ESLINT_EXIT_CODE"
-        exit 0 # Ensure the step doesn't fail the job even if ESLint finds issues
+        echo "--- Debugging ESLint binary invocation ---"
+        npx eslint --version 2>&1
+        echo "ESLint --version command finished."
+        echo "--- End Debugging ESLint binary invocation ---"
+
+        echo "Attempting to run ESLint with config only (no files to lint yet):"
+        # Test if just loading the config causes a crash.
+        # We'll output to a temporary file to distinguish it.
+        npx eslint --config ./eslint.config.js --format json --output-file eslint-report-config-only.json 2>&1
+        ESLINT_CONFIG_EXIT_CODE=$?
+        echo "ESLint config-only command finished with exit code: $ESLINT_CONFIG_EXIT_CODE"
+
+        # Check if the config-only command failed. If it did, exit immediately with its error.
+        if [ "$ESLINT_CONFIG_EXIT_CODE" -ne 0 ]; then
+          echo "ERROR: ESLint failed when only loading the configuration file. Check eslint-report-config-only.json for details if generated, or previous logs for a crash message."
+          exit "$ESLINT_CONFIG_EXIT_CODE" # Exit with the config error code to show it failed here
+        fi
+
+        echo "ESLint config loaded successfully. Proceeding with full scan..."
+        echo "Attempting to run main ESLint command with files:"
+        # If config loaded, then proceed with the full scan.
+        npx eslint './server/**/*.js' --config ./eslint.config.js --format json --output-file eslint-report.json 2>&1
+        ESLINT_FULL_EXIT_CODE=$?
+        echo "ESLint full scan command finished with exit code: $ESLINT_FULL_EXIT_CODE"
+        
+        # This will make the step fail if ESLint itself finds linting errors (exit code 1)
+        # or if it crashes during the full scan.
+        exit "$ESLINT_FULL_EXIT_CODE" 
       # No 'working-directory' is set for this step, so it runs from the repo root
 
     - name: 🔎 Debug ESLint Report File Presence and Content
