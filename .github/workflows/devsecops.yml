@@ -48,7 +48,16 @@ jobs:
       with:
         dockerfile: ./server/Dockerfile
 
-    - name: Run ESLint and capture output (ISOLATING FILE ISSUE) # Updated step name
+    - name: Run ESLint and capture output (FINAL DEBUGGING ATTEMPT)
+      env:
+        # Enable Node.js to trace uncaught exceptions that might be causing a silent crash
+        NODE_OPTIONS: '--trace-uncaught'
+        # Keep other environment variables if you have them:
+        # IMAGE_NAME: ${{ env.IMAGE_NAME }}
+        # DB_KEY: ${{ secrets.DB_KEY }}
+        # DB_URL: ${{ secrets.DB_URL }}
+        # ACTIONS_STEP_DEBUG: true
+        # ACTIONS_RUNNER_DEBUG: true
       run: |
         set -euxo pipefail # Enable verbose debugging and fail on first error
 
@@ -68,15 +77,15 @@ jobs:
         fi
         echo "--- Node.js execution of eslint.config.js successful. ---"
 
-        echo "ESLint config loaded successfully. Proceeding with scan on single test file..."
-        echo "Attempting to run ESLint on: ./temp-test.js"
-        # Changed the target from './server/**/*.js' to './temp-test.js'
-        npx eslint './temp-test.js' --config ./eslint.config.js --format json --output-file eslint-report.json 2>&1
+        echo "ESLint config loaded successfully. Proceeding with full scan..."
+        echo "Attempting to run main ESLint command on: './server/**/*.js'"
+        # Revert target back to your original glob pattern and ensure all output is captured.
+        npx eslint './server/**/*.js' --config ./eslint.config.js --format json --output-file eslint-report.json 2>&1
         ESLINT_FULL_EXIT_CODE=$?
-        echo "ESLint scan on temp-test.js finished with exit code: $ESLINT_FULL_EXIT_CODE"
-
+        echo "ESLint full scan command finished with exit code: $ESLINT_FULL_EXIT_CODE"
+        
         # This will make the step fail if ESLint itself finds linting errors (exit code 1)
-        # or if it crashes during the scan of the test file.
+        # or if it crashes during the full scan.
         exit "$ESLINT_FULL_EXIT_CODE"
 
     - name: 🔎 Debug ESLint Report File Presence and Content
