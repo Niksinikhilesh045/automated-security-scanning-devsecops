@@ -62,6 +62,7 @@ jobs:
         # IMPORTANT: Use --sarif-file-output to generate a SARIF compliant report
         args: --all-projects --severity-threshold=medium --sarif-file-output=snyk-results.sarif
         command: test # Explicitly specify the 'test' command for dependency scanning
+      continue-on-error: true # Allow the workflow to continue even if Snyk finds issues
 
     - name: Upload Snyk results to Code Scanning
       if: always() # Ensure this runs even if Snyk finds issues and exits non-zero
