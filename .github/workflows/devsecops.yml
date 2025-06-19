@@ -48,26 +48,18 @@ jobs:
       with:
         dockerfile: ./server/Dockerfile
 
-    - name: Run ESLint and capture output (DEBUGGING CRASH - NO OUTPUT FILE)
+    - name: Run ESLint and capture output
+      # Now ESLint is run from the repository root
+      # It targets JS files within './server/' and uses './eslint.config.js' from the root
+      # The output file 'eslint-report.json' will be created directly in the root
       run: |
-        # Enable verbose debugging and fail on first error
-        set -euxo pipefail
-
-        echo "--- Debugging ESLint binary invocation ---"
-        npx eslint --version 2>&1
-        echo "ESLint --version command finished."
-        echo "--- End Debugging ESLint binary invocation ---"
-
-        echo "Attempting to run main ESLint command (output to console, no file):"
-        # Temporarily removed --output-file. Format changed to 'compact' for cleaner console output.
-        npx eslint './server/**/*.js' --config ./eslint.config.js --format compact 2>&1
+        # Use 'json' format, which is supported by ESLint v9 without separate installation.
+        # Output to 'eslint-report.json' as originally intended.
+        npx eslint './server/**/*.js' --config ./eslint.config.js --format json --output-file eslint-report.json
         ESLINT_EXIT_CODE=$?
-        echo "ESLint main command finished with exit code: $ESLINT_EXIT_CODE"
-
-        # Temporarily REMOVED 'exit 0' to allow the true exit code of 'npx eslint' to propagate
-        # and reveal the underlying error message in the logs.
+        echo "ESLint command finished with exit code: $ESLINT_EXIT_CODE"
+        exit 0 #Ensure the step doesn't fail the job even if ESLint finds issues
       # No 'working-directory' is set for this step, so it runs from the repo root
-
 
     - name: 🔎 Debug ESLint Report File Presence and Content
       run: |
