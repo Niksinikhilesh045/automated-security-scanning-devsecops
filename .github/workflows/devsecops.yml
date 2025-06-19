@@ -48,16 +48,30 @@ jobs:
       with:
         dockerfile: ./server/Dockerfile
 
-    - name: Run ESLint and capture output
-      # ESLint is now run from the repository root
-      # It targets JS files within './server/' and uses './eslint.config.js' from the root
-      # The output file 'eslint-report.json' will be created directly in the root
+    - name: Run ESLint and capture output (DEBUGGING CRASH)
       run: |
-        npx eslint './server/**/*.js' --config ./eslint.config.js --format json --output-file eslint-report.json
+        # Set options for verbose debugging:
+        # -e: Exit immediately if a command exits with a non-zero status.
+        # -u: Treat unset variables as an error.
+        # -x: Print commands and their arguments as they are executed.
+        # -o pipefail: Ensure pipelines fail if any command in the pipe fails.
+        set -euxo pipefail
+
+        # Execute ESLint. Redirect stderr to stdout (2>&1) to capture all output.
+        npx eslint './server/**/*.js' --config ./eslint.config.js --format json --output-file eslint-report.json 2>&1
+
+        # The following lines might not be reached if npx eslint crashes critically,
+        # but they are kept for cases where it provides an exit code without crashing the shell.
         ESLINT_EXIT_CODE=$?
         echo "ESLint command finished with exit code: $ESLINT_EXIT_CODE"
-        exit 0 # Ensure the step doesn't fail the job even if ESLint finds issues
+
+        # IMPORTANT DEBUGGING NOTE:
+        # Currently, 'exit 0' is REMOVED to allow the true exit code of 'npx eslint' to propagate
+        # and reveal the underlying error message in the logs.
+        # Once the error is identified and fixed, you should RE-ADD 'exit 0' HERE:
+        # exit 0
       # No 'working-directory' is set for this step, so it runs from the repo root
+
 
     - name: 🔎 Debug ESLint Report File Presence and Content
       run: |
