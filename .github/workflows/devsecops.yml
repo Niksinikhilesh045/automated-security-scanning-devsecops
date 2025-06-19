@@ -21,7 +21,7 @@ jobs:
   security-scan:
     name: 🛡️ Security Scan
     runs-on: ubuntu-latest
-    env: # Add these debug variables to the job level
+    env:
       ACTIONS_STEP_DEBUG: true
       ACTIONS_RUNNER_DEBUG: true
 
@@ -29,65 +29,74 @@ jobs:
     - name: 🧾 Checkout Code
       uses: actions/checkout@v3
 
+    - name: ⚙️ Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '24.0.2'
+
+    - name: Install root npm dependencies (for ESLint and its config)
+      # This runs in the repository root and installs devDependencies from root package.json
+      run: npm ci
+
+    - name: Install server npm dependencies
+      # This installs dependencies specifically for the ./server application
+      run: npm ci
+      working-directory: ./server
+
     - name: 🔍 Lint Dockerfile (Hadolint)
       uses: hadolint/hadolint-action@v2.0.0
       with:
         dockerfile: ./server/Dockerfile
 
-    - name: 🔍 Lint JavaScript with ESLint
-      uses: actions/setup-node@v3
-      with:
-        node-version: '24.0.2'
-    - run: npm ci
-      working-directory: ./server
     - name: Run ESLint and capture output
+      # ESLint is now run from the repository root
+      # It targets JS files within './server/' and uses './eslint.config.js' from the root
+      # The output file 'eslint-report.json' will be created directly in the root
       run: |
-        # Run ESLint, allowing it to fail, but capture its exit code
-        npx eslint './**/*.js' --config ../eslint.config.js --format json --output-file eslint-report.json # <-- This is the corrected path
+        npx eslint './server/**/*.js' --config ./eslint.config.js --format json --output-file eslint-report.json
         ESLINT_EXIT_CODE=$?
         echo "ESLint command finished with exit code: $ESLINT_EXIT_CODE"
-        exit 0
-      working-directory: ./server
+        exit 0 # Ensure the step doesn't fail the job even if ESLint finds issues
+      # No 'working-directory' is set for this step, so it runs from the repo root
 
     - name: 🔎 Debug ESLint Report File Presence and Content
       run: |
-        echo "--- Listing contents of ./server directory: ---"
-        ls -la ./server
+        echo "--- Listing contents of root directory: ---"
+        ls -la ./
         echo "----------------------------------------------"
 
         echo "--- Checking for eslint-report.json: ---"
-        if [ -f "./server/eslint-report.json" ]; then
-          echo "✅ eslint-report.json FOUND at ./server/eslint-report.json!"
+        if [ -f "./eslint-report.json" ]; # File is now expected in root
+        then
+          echo "✅ eslint-report.json FOUND at ./eslint-report.json!"
           echo "File size:"
-          wc -c ./server/eslint-report.json
+          wc -c ./eslint-report.json
           echo "First 20 lines of eslint-report.json (if file is not binary):"
-          head -n 20 ./server/eslint-report.json || echo "Could not display content (file might be empty or too large)."
-          # Check if the file is empty JSON array, which might happen if no issues
-          if [ "$(jq length < ./server/eslint-report.json)" -eq 0 ]; then
+          head -n 20 ./eslint-report.json || echo "Could not display content (file might be empty or too large)."
+          if [ "$(jq length < ./eslint-report.json)" -eq 0 ]; then
             echo "Note: eslint-report.json is an empty JSON array []."
           fi
         else
-          echo "❌ eslint-report.json NOT FOUND in ./server."
+          echo "❌ eslint-report.json NOT FOUND in root."
           echo "Possible reasons: ESLint command failed, no JS files matched, or output path is incorrect."
         fi
         echo "----------------------------------------------"
 
-    # The following steps remain the same, ensuring paths are correct.
     - name: Generate ESLint summary
       id: eslint-summary
-      if: success() && hashFiles('server/eslint-report.json') != ''
+      if: success() && hashFiles('eslint-report.json') != '' # Path adjusted to root
       run: |
         jq -r '
           if length == 0 then
             "✅ No ESLint errors or warnings found."
           else
-            ("⚠️ ESLint found " + (map(.messages | length) | add | tostring) + " issues.") 
+            ("⚠️ ESLint found " + (map(.messages | length) | add | tostring) + " issues.")
           end
-        ' server/eslint-report.json > server/eslint-summary.txt
+        ' eslint-report.json > eslint-summary.txt # Path adjusted to root
       shell: bash
 
     - name: Fallback ESLint summary if no report
-      if: hashFiles('server/eslint-report.json') == ''
+      if: hashFiles('eslint-report.json') == '' # Path adjusted to root
       run: echo "⚠️ ESLint did not produce a report file. Check if JS files exist or ESLint ran correctly."
 
     - name: Comment ESLint results on PR
@@ -104,7 +113,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: eslint-report
-        path: ./server/eslint-report.json
+        path: eslint-report.json # Path adjusted to root
 
     - name: 🔐 Secret Scan with Gitleaks (exclude .vite)
       run: |
