@@ -48,7 +48,7 @@ jobs:
       with:
         dockerfile: ./server/Dockerfile
 
-    - name: Run ESLint and capture output (DEEPER DEBUGGING - CONFIG ONLY)
+    - name: Run ESLint and capture output (DEEPEST DEBUGGING - NODE EXEC)
       run: |
         set -euxo pipefail # Enable verbose debugging and fail on first error
 
@@ -57,18 +57,21 @@ jobs:
         echo "ESLint --version command finished."
         echo "--- End Debugging ESLint binary invocation ---"
 
-        echo "Attempting to run ESLint with config only (no files to lint yet):"
-        # Test if just loading the config causes a crash.
-        # We'll output to a temporary file to distinguish it.
-        npx eslint --config ./eslint.config.js --format json --output-file eslint-report-config-only.json 2>&1
-        ESLINT_CONFIG_EXIT_CODE=$?
-        echo "ESLint config-only command finished with exit code: $ESLINT_CONFIG_EXIT_CODE"
+        echo "--- Attempting direct Node.js execution of eslint.config.js ---"
+        echo "Running: node --input-type=module --eval 'import config from \"./eslint.config.js\"; console.log(\"Config loaded successfully!\");'"
+        # Attempt to load the config file directly with Node.js
+        # This will use Node's ES module loader and should give a more verbose error if it fails.
+        # We specify --input-type=module to force Node to treat the input as an ES module, matching your package.json type.
+        node --input-type=module --eval 'import config from "./eslint.config.js"; console.log("Config loaded successfully!");' 2>&1
+        NODE_CONFIG_EXIT_CODE=$?
+        echo "Node.js config load command finished with exit code: $NODE_CONFIG_EXIT_CODE"
 
-        # Check if the config-only command failed. If it did, exit immediately with its error.
-        if [ "$ESLINT_CONFIG_EXIT_CODE" -ne 0 ]; then
-          echo "ERROR: ESLint failed when only loading the configuration file. Check eslint-report-config-only.json for details if generated, or previous logs for a crash message."
-          exit "$ESLINT_CONFIG_EXIT_CODE" # Exit with the config error code to show it failed here
+        if [ "$NODE_CONFIG_EXIT_CODE" -ne 0 ]; then
+          echo "CRITICAL ERROR: Node.js failed to load eslint.config.js directly. See logs above for Node.js's specific error message."
+          exit "$NODE_CONFIG_EXIT_CODE" # Exit with Node.js's error code
         fi
+        echo "--- Node.js execution of eslint.config.js successful. ---"
+
 
         echo "ESLint config loaded successfully. Proceeding with full scan..."
         echo "Attempting to run main ESLint command with files:"
@@ -79,8 +82,7 @@ jobs:
         
         # This will make the step fail if ESLint itself finds linting errors (exit code 1)
         # or if it crashes during the full scan.
-        exit "$ESLINT_FULL_EXIT_CODE" 
-      # No 'working-directory' is set for this step, so it runs from the repo root
+        exit "$ESLINT_FULL_EXIT_CODE"
 
     - name: 🔎 Debug ESLint Report File Presence and Content
       run: |
