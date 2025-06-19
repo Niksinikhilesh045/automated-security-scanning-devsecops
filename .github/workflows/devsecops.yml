@@ -48,21 +48,19 @@ jobs:
       with:
         dockerfile: ./server/Dockerfile
 
-    - name: Run ESLint and capture output (DEBUGGING CRASH)
+    - name: Run ESLint and capture output (DEBUGGING CRASH - NO OUTPUT FILE)
       run: |
         # Enable verbose debugging and fail on first error
         set -euxo pipefail
 
         echo "--- Debugging ESLint binary invocation ---"
-        echo "Attempting to run: npx eslint --version"
-        # Run a very basic ESLint command to check if the binary can be executed.
-        # Redirect stderr to stdout and ensure the shell exits if this fails.
         npx eslint --version 2>&1
         echo "ESLint --version command finished."
         echo "--- End Debugging ESLint binary invocation ---"
 
-        echo "Attempting to run main ESLint command:"
-        npx eslint './server/**/*.js' --config ./eslint.config.js --format json --output-file eslint-report.json 2>&1
+        echo "Attempting to run main ESLint command (output to console, no file):"
+        # Temporarily removed --output-file. Format changed to 'compact' for cleaner console output.
+        npx eslint './server/**/*.js' --config ./eslint.config.js --format compact 2>&1
         ESLINT_EXIT_CODE=$?
         echo "ESLint main command finished with exit code: $ESLINT_EXIT_CODE"
 
