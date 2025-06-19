@@ -40,12 +40,43 @@ jobs:
         node-version: '24.0.2'
     - run: npm ci
       working-directory: ./server
-    - run: npx eslint './**/*.js' --config eslint.config.js --format json --output-file eslint-report.json || true
+    - name: Run ESLint and capture output
+      run: |
+        # Run ESLint, allowing it to fail, but capture its exit code
+        npx eslint './**/*.js' --config eslint.config.js --format json --output-file eslint-report.json
+        ESLINT_EXIT_CODE=$?
+        echo "ESLint command finished with exit code: $ESLINT_EXIT_CODE"
+        # If ESLint fails (exit code 1 or more), we still want to proceed to artifact upload
+        # but capture its state for debugging.
+        # This prevents the step from failing immediately if issues are found,
+        # but allows us to inspect the exit code.
+        exit 0
       working-directory: ./server
 
-    - name: 🔎 List JS Files for Debug
-      run: find ./server -name "*.js"
+    - name: 🔎 Debug ESLint Report File Presence and Content
+      run: |
+        echo "--- Listing contents of ./server directory: ---"
+        ls -la ./server
+        echo "----------------------------------------------"
 
+        echo "--- Checking for eslint-report.json: ---"
+        if [ -f "./server/eslint-report.json" ]; then
+          echo "✅ eslint-report.json FOUND at ./server/eslint-report.json!"
+          echo "File size:"
+          wc -c ./server/eslint-report.json
+          echo "First 20 lines of eslint-report.json (if file is not binary):"
+          head -n 20 ./server/eslint-report.json || echo "Could not display content (file might be empty or too large)."
+          # Check if the file is empty JSON array, which might happen if no issues
+          if [ "$(jq length < ./server/eslint-report.json)" -eq 0 ]; then
+            echo "Note: eslint-report.json is an empty JSON array []."
+          fi
+        else
+          echo "❌ eslint-report.json NOT FOUND in ./server."
+          echo "Possible reasons: ESLint command failed, no JS files matched, or output path is incorrect."
+        fi
+        echo "----------------------------------------------"
+
+    # The following steps remain the same, ensuring paths are correct.
     - name: Generate ESLint summary
       id: eslint-summary
       if: success() && hashFiles('server/eslint-report.json') != ''
