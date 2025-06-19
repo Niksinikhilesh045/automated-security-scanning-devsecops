@@ -77,7 +77,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: eslint-report
-        path: eslint-report.json
+        path: ./server/eslint-report.json
 
     - name: 🔐 Secret Scan with Gitleaks (exclude .vite)
       run: |
