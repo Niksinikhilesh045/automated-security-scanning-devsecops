@@ -2,7 +2,7 @@
 
 services:
   server:
-    image: my_custom_api:latest
+    image: nikhileshsingh/automated-security-scanning-devsecops:latest
     build:
       context: ./server
       dockerfile: Dockerfile
