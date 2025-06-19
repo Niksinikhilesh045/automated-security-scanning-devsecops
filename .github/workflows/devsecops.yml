@@ -29,120 +29,55 @@ jobs:
     - name: 🧾 Checkout Code
       uses: actions/checkout@v3
 
-    - name: ⚙️ Set up Node.js
+    - name: ⚙️ Set up Node.js (for Snyk)
       uses: actions/setup-node@v3
       with:
         node-version: '24.0.2'
 
-    - name: Install root npm dependencies (for ESLint and its config)
+    - name: Install root npm dependencies (for Snyk and general project setup)
       # This runs in the repository root and installs devDependencies from root package.json
       run: npm ci
 
-    - name: Install server npm dependencies
+    - name: Install server npm dependencies (for Snyk to find server app dependencies)
       # This installs dependencies specifically for the ./server application
       run: npm ci
       working-directory: ./server
+
+     # --- Static Application Security Testing (SAST) with CodeQL ---
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: javascript # Specify the language of your codebase
+
+    - name: Autobuild CodeQL # Helps CodeQL understand compiled code, useful for JS projects
+      uses: github/codeql-action/autobuild@v3
+
+    # --- Dependency Vulnerability Scanning with Snyk ---
+    - name: Snyk Vulnerability Scan
+      uses: snyk/actions/node@master # Use the correct Snyk action for Node.js projects
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }} # Ensure this secret is configured in your repo
+      with:
+        # Scan all projects (package.json files), set severity threshold to medium
+        # Output results to a SARIF file for GitHub Code Scanning
+        args: --all-projects --severity-threshold=medium --json-file-output=snyk-results.json
+
+    - name: Upload Snyk results to Code Scanning
+      if: always() # Ensure this runs even if Snyk finds issues and exits non-zero
+      uses: github/codeql-action/upload-sarif@v3 # Re-using the same SARIF upload action
+      with:
+        sarif_file: snyk-results.json
+        # 'category' helps differentiate results in Code Scanning UI if you have multiple SARIF uploads
+        category: snyk-dependency-scan
+
+    # --- Perform CodeQL Analysis (after build/dependency steps) ---
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
 
     - name: 🔍 Lint Dockerfile (Hadolint)
       uses: hadolint/hadolint-action@v2.0.0
       with:
         dockerfile: ./server/Dockerfile
-
-    - name: Run ESLint and capture output (FINAL DEBUGGING ATTEMPT)
-      env:
-        # Enable Node.js to trace uncaught exceptions that might be causing a silent crash
-        NODE_OPTIONS: '--trace-uncaught'
-        # Keep other environment variables if you have them:
-        # IMAGE_NAME: ${{ env.IMAGE_NAME }}
-        # DB_KEY: ${{ secrets.DB_KEY }}
-        # DB_URL: ${{ secrets.DB_URL }}
-        # ACTIONS_STEP_DEBUG: true
-        # ACTIONS_RUNNER_DEBUG: true
-      run: |
-        set -euxo pipefail # Enable verbose debugging and fail on first error
-
-        echo "--- Debugging ESLint binary invocation ---"
-        npx eslint --version 2>&1
-        echo "ESLint --version command finished."
-        echo "--- End Debugging ESLint binary invocation ---"
-
-        echo "--- Attempting direct Node.js execution of eslint.config.js ---"
-        node --input-type=module --eval 'import config from "./eslint.config.js"; console.log("Config loaded successfully!");' 2>&1
-        NODE_CONFIG_EXIT_CODE=$?
-        echo "Node.js config load command finished with exit code: $NODE_CONFIG_EXIT_CODE"
-
-        if [ "$NODE_CONFIG_EXIT_CODE" -ne 0 ]; then
-          echo "CRITICAL ERROR: Node.js failed to load eslint.config.js directly. See logs above for Node.js's specific error message."
-          exit "$NODE_CONFIG_EXIT_CODE"
-        fi
-        echo "--- Node.js execution of eslint.config.js successful. ---"
-
-        echo "ESLint config loaded successfully. Proceeding with full scan..."
-        echo "Attempting to run main ESLint command on: './server/**/*.js'"
-        # Revert target back to your original glob pattern and ensure all output is captured.
-        npx eslint './server/**/*.js' --config ./eslint.config.js --format json --output-file eslint-report.json 2>&1
-        ESLINT_FULL_EXIT_CODE=$?
-        echo "ESLint full scan command finished with exit code: $ESLINT_FULL_EXIT_CODE"
-        
-        # This will make the step fail if ESLint itself finds linting errors (exit code 1)
-        # or if it crashes during the full scan.
-        exit "$ESLINT_FULL_EXIT_CODE"
-
-    - name: 🔎 Debug ESLint Report File Presence and Content
-      run: |
-        echo "--- Listing contents of root directory: ---"
-        ls -la ./
-        echo "----------------------------------------------"
-
-        echo "--- Checking for eslint-report.json: ---"
-        if [ -f "./eslint-report.json" ]; # File is now expected in root
-        then
-          echo "✅ eslint-report.json FOUND at ./eslint-report.json!"
-          echo "File size:"
-          wc -c ./eslint-report.json
-          echo "First 20 lines of eslint-report.json (if file is not binary):"
-          head -n 20 ./eslint-report.json || echo "Could not display content (file might be empty or too large)."
-          if [ "$(jq length < ./eslint-report.json)" -eq 0 ]; then
-            echo "Note: eslint-report.json is an empty JSON array []."
-          fi
-        else
-          echo "❌ eslint-report.json NOT FOUND in root."
-          echo "Possible reasons: ESLint command failed, no JS files matched, or output path is incorrect."
-        fi
-        echo "----------------------------------------------"
-
-    - name: Generate ESLint summary
-      id: eslint-summary
-      if: success() && hashFiles('eslint-report.json') != '' # Path adjusted to root
-      run: |
-        jq -r '
-          if length == 0 then
-            "✅ No ESLint errors or warnings found."
-          else
-            ("⚠️ ESLint found " + (map(.messages | length) | add | tostring) + " issues.")
-          end
-        ' eslint-report.json > eslint-summary.txt # Path adjusted to root
-      shell: bash
-
-    - name: Fallback ESLint summary if no report
-      if: hashFiles('eslint-report.json') == '' # Path adjusted to root
-      run: echo "⚠️ ESLint did not produce a report file. Check if JS files exist or ESLint ran correctly."
-
-    - name: Comment ESLint results on PR
-      if: github.event_name == 'pull_request'
-      uses: peter-evans/create-or-update-comment@v4
-      with:
-        token: ${{ github.token }}
-        issue-number: ${{ github.event.pull_request.number }}
-        body: |
-          ### ESLint Results Summary
-          ${{ steps.eslint-summary.outputs.comment }}
-
-    - name: Upload ESLint Report Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: eslint-report
-        path: eslint-report.json # Path adjusted to root
 
     - name: 🔐 Secret Scan with Gitleaks (exclude .vite)
       run: |
@@ -180,6 +115,7 @@ jobs:
         sarif_file: gitleaks-results.sarif
         token: ${{ github.token }}
         wait-for-processing: true
+        category: gitleaks-secrets # Differentiate from other SARIF uploads
 
     - name: ⚙️ Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
@@ -352,13 +288,6 @@ jobs:
       id: zap_status
       run: echo "zap_scan_conclusion=${{ needs.zap-scan.result }}" >> "$GITHUB_OUTPUT"
 
-    - name: Download ESLint Report Artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: eslint-report
-        path: ./eslint-reports # Download to a specific directory
-      continue-on-error: true # Don't fail if artifact isn't found (e.g., no JS files, or previous step failed)
-
     - name: Download ZAP Reports Artifact
       uses: actions/download-artifact@v4
       with:
@@ -407,11 +336,6 @@ jobs:
         else
           ZAP_SUMMARY=":warning: *ZAP Scan Vulnerabilities:* Report not found.\n"
         fi
-
-        # Set outputs for next step
-        echo "ESLINT_SUMMARY<<EOF" >> "$GITHUB_OUTPUT"
-        echo "$ESLINT_SUMMARY" >> "$GITHUB_OUTPUT"
-        echo "EOF" >> "$GITHUB_OUTPUT"
 
         echo "ZAP_SUMMARY<<EOF" >> "$GITHUB_OUTPUT"
         echo "$ZAP_SUMMARY" >> "$GITHUB_OUTPUT"
