@@ -2,7 +2,7 @@
 
 A complete end-to-end project that integrates a **Node.js full-stack web application** with a robust **DevSecOps CI/CD pipeline** using GitHub Actions. This project emphasises **secure coding practices**, **automated vulnerability detection**, and **continuous delivery** with **real-time alerts** and **container security**.
 
-> ⚙️ Developed with the support of [Harsh Chauhan](https://www.linkedin.com/in/harsh-chauhan), who contributed significantly to the application development phase of the project.
+> ⚙️ Developed with the support of [Harsh Chauhan](https://github.com/Harsh2509), who contributed significantly to the application development phase of the project.
 
 ---
 
