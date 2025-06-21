@@ -42,3 +42,26 @@ A complete end-to-end project that integrates a **Node.js full-stack web applica
 
 ## 🧱 Project Structure
 
+project-root/
+├── .github/workflows/devsecops.yml     # CI/CD pipeline configuration
+├── client/                             # React frontend
+├── server/                             # Node/Express backend
+│   ├── Dockerfile                      # Dockerfile for server
+│   └── package.json                    # Backend dependencies
+├── docker-compose.yml                 # Docker Compose setup
+└── README.md                           # Project overview and documentation
+
+---
+
+## 📊 Pipeline Features
+
+* Static Code Analysis with CodeQL
+* Dependency Scanning using Snyk
+* Secrets Detection via Gitleaks
+* Container Vulnerability Scanning with Trivy
+* Docker Best Practices Linting via Dockle
+* DAST Scanning with OWASP ZAP
+* Slack Notification on failure
+* Multi-tagged Docker Builds and Pushes to DockerHub
+
+---
