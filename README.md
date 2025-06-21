@@ -42,6 +42,7 @@ A complete end-to-end project that integrates a **Node.js full-stack web applica
 
 ## 🧱 Project Structure
 
+```bash
 project-root/
 ├── .github/workflows/devsecops.yml     # CI/CD pipeline configuration
 ├── client/                             # React frontend
@@ -50,6 +51,7 @@ project-root/
 │   └── package.json                    # Backend dependencies
 ├── docker-compose.yml                 # Docker Compose setup
 └── README.md                           # Project overview and documentation
+```
 
 ---
 
