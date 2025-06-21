@@ -21,21 +21,21 @@ A complete end-to-end project that integrates a **Node.js full-stack web applica
 
 ### 🔐 DevSecOps & Security Tools
 
-[![CodeQL](https://img.shields.io/badge/CodeQL-2b2b2b?style=for-the-badge&logo=github&logoColor=white)](https://codeql.github.com/)  
-[![Snyk](https://img.shields.io/badge/Snyk-4c4a73?style=for-the-badge&logo=snyk&logoColor=white)](https://snyk.io/)  
-[![Trivy](https://img.shields.io/badge/Trivy-0f93e0?style=for-the-badge&logo=trivy&logoColor=white)](https://aquasecurity.github.io/trivy/)  
-[![Dockle](https://img.shields.io/badge/Dockle-009688?style=for-the-badge&logo=docker&logoColor=white)](https://github.com/goodwithtech/dockle)  
-[![OWASP ZAP](https://img.shields.io/badge/OWASP%20ZAP-2e72b8?style=for-the-badge&logo=OWASP&logoColor=white)](https://www.zaproxy.org/)  
-[![Gitleaks](https://img.shields.io/badge/Gitleaks-1b1f23?style=for-the-badge&logo=git&logoColor=white)](https://github.com/gitleaks/gitleaks)  
+[![CodeQL](https://img.shields.io/badge/CodeQL-2b2b2b?style=for-the-badge&logo=github&logoColor=white)](https://codeql.github.com/)
+[![Snyk](https://img.shields.io/badge/Snyk-4c4a73?style=for-the-badge&logo=snyk&logoColor=white)](https://snyk.io/)
+[![Trivy](https://img.shields.io/badge/Trivy-0f93e0?style=for-the-badge&logo=trivy&logoColor=white)](https://aquasecurity.github.io/trivy/)
+[![Dockle](https://img.shields.io/badge/Dockle-009688?style=for-the-badge&logo=docker&logoColor=white)](https://github.com/goodwithtech/dockle)
+[![OWASP ZAP](https://img.shields.io/badge/OWASP%20ZAP-2e72b8?style=for-the-badge&logo=OWASP&logoColor=white)](https://www.zaproxy.org/)
+[![Gitleaks](https://img.shields.io/badge/Gitleaks-1b1f23?style=for-the-badge&logo=git&logoColor=white)](https://github.com/gitleaks/gitleaks)
 [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 
 ---
 
 ### ⚙️ CI/CD and Monitoring
 
-[![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/features/actions)  
-[![YAML](https://img.shields.io/badge/YAML-000000?style=for-the-badge&logo=yaml&logoColor=white)](https://yaml.org/)  
-[![Slack](https://img.shields.io/badge/Slack-4A154B?style=for-the-badge&logo=slack&logoColor=white)](https://slack.com/)  
+[![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/features/actions)
+[![YAML](https://img.shields.io/badge/YAML-000000?style=for-the-badge&logo=yaml&logoColor=white)](https://yaml.org/)
+[![Slack](https://img.shields.io/badge/Slack-4A154B?style=for-the-badge&logo=slack&logoColor=white)](https://slack.com/)
 [![DockerHub](https://img.shields.io/badge/DockerHub-0db7ed?style=for-the-badge&logo=docker&logoColor=white)](https://hub.docker.com/)
 
 ---
