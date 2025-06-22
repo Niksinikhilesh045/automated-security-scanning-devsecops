@@ -1,6 +1,6 @@
 # 🔐 Automated Security Scanning within DevSecOps CI/CD Pipeline
 
-A complete end-to-end project that integrates a **Node.js full-stack web application** with a robust **DevSecOps CI/CD pipeline** using GitHub Actions. This project emphasises **secure coding practices**, **automated vulnerability detection**, and **continuous delivery** with **real-time alerts** and **container security**.
+A GitHub Actions-powered CI/CD pipeline for **automated application security scanning** and **containerised deployments** with real-time vulnerability reporting. This project integrates multiple security layers—SAST, DAST, dependency scanning, container scanning, secret detection, and notification delivery—to ensure production-grade security from development to deployment.
 
 > ⚙️ Developed with the support of [Harsh Chauhan](https://github.com/Harsh2509), who contributed significantly to the application development phase of the project.
 
