@@ -67,3 +67,62 @@ project-root/
 * Multi-tagged Docker Builds and Pushes to DockerHub
 
 ---
+
+# 🧬 CI/CD Pipeline Overview
+
+This pipeline includes five key stages:
+
+## 🛡️ `security-scan`
+**Objective:** Secure code and containers before deployment.
+
+- **CodeQL SAST** for JavaScript vulnerabilities
+- **Snyk scan** for dependency vulnerabilities
+- **Gitleaks** for secret detection
+- **Hadolint** for Dockerfile best practices
+- **Dockle** for container hardening
+- **Trivy** for image CVE scanning
+- Uploads reports to GitHub Security and artifacts
+
+## 🛠️ `build`
+**Objective:** Build Docker images with `docker-compose`.
+
+- Injects secrets
+- Runs `docker-compose build`
+
+## 📦 `dockerhub-push`
+**Objective:** Push versioned images.
+
+- Builds and tags images with `latest` and `commit-sha`
+- Pushes to DockerHub
+
+## 🔥 `zap-scan`
+**Objective:** DAST scan with OWASP ZAP.
+
+- Starts frontend service
+- Waits for readiness
+- Runs ZAP scan on `http://localhost:8080`
+- Uploads reports and creates GitHub issues
+
+## 🔔 `slack-alert`
+**Objective:** Notifications based on results.
+
+- Evaluates job statuses
+- Summarises ESLint and ZAP alerts
+- Sends a formatted alert message to the Slack channel
+
+---
+
+# ✅ Security Coverage Summary
+
+| Check Type                         | Tool Used        | Reported To                  |
+|-----------------------------------|------------------|------------------------------|
+| Static Code Analysis              | CodeQL           | GitHub Code Scanning         |
+| Dependency Vulnerability Scanning | Snyk             | GitHub Code Scanning (SARIF) |
+| Secret Detection                  | Gitleaks         | GitHub Code Scanning (SARIF) |
+| Dockerfile Lint                   | Hadolint         | GitHub Action Logs           |
+| Image Hardening Best Practices    | Dockle           | GitHub Action Logs           |
+| Image Vulnerability Scan          | Trivy            | GitHub Action Logs           |
+| DAST (Web App Scan)               | OWASP ZAP        | GitHub Issues + Artifacts    |
+| Slack Notification                | curl             | Slack Channel                |
+
+---
