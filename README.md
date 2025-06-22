@@ -70,45 +70,53 @@ project-root/
 
 # 🧬 CI/CD Pipeline Overview
 
-This pipeline includes five key stages:
+This pipeline includes five key stages with integrated security and build processes:
 
 ## 🛡️ `security-scan`
-**Objective:** Secure code and containers before deployment.
+**Objective:** Run comprehensive static security scans and prepare development artifacts.
 
-- **CodeQL SAST** for JavaScript vulnerabilities
-- **Snyk scan** for dependency vulnerabilities
-- **Gitleaks** for secret detection
-- **Hadolint** for Dockerfile best practices
-- **Dockle** for container hardening
-- **Trivy** for image CVE scanning
-- Uploads reports to GitHub Security and artifacts
+- **Node Setup:** Installs Node.js 24.0.2 for compatibility with tools like Snyk.
+- **NPM Install:** Installs dependencies in both root and `server` directories.
+- **CodeQL:** Performs static application security testing (SAST) for JavaScript using GitHub Code Scanning.
+- **Snyk:** Scans for known vulnerabilities in dependencies (`package.json`) and generates SARIF reports.
+- **Gitleaks:** Scans for hardcoded secrets in source files.
+- **Hadolint:** Ensures Dockerfile adheres to best practices.
+- **Dockle:** Analyses Docker image configurations for security hardening.
+- **Trivy:** Performs vulnerability scanning on the Docker image, reporting CRITICAL/HIGH CVEs.
+- **Artifact Uploads:** All SARIF and scan reports are uploaded for GitHub security insights.
 
 ## 🛠️ `build`
-**Objective:** Build Docker images with `docker-compose`.
+**Objective:** Build the application stack using Docker Compose.
 
-- Injects secrets
-- Runs `docker-compose build`
+- **Secrets Injection:** Securely injects DB credentials into `.env` files.
+- **Compose Build:** Builds multi-container services from `docker-compose.yml`.
 
 ## 📦 `dockerhub-push`
-**Objective:** Push versioned images.
+**Objective:** Create and push versioned Docker images.
 
-- Builds and tags images with `latest` and `commit-sha`
-- Pushes to DockerHub
+- **Docker Login:** Authenticates with DockerHub using secrets.
+- **Image Tagging:** Tags the image using both `latest` and Git short SHA.
+- **Push:** Publishes both image tags to DockerHub.
 
 ## 🔥 `zap-scan`
-**Objective:** DAST scan with OWASP ZAP.
+**Objective:** Perform DAST scanning using OWASP ZAP.
 
-- Starts frontend service
-- Waits for readiness
-- Runs ZAP scan on `http://localhost:8080`
-- Uploads reports and creates GitHub issues
+- **Start Frontend:** Spins up the client service using Docker Compose.
+- **Wait for Readiness:** Ensures the frontend is accessible before scanning.
+- **Permissions Fix:** Sets workspace permissions to allow ZAP file writes.
+- **ZAP Scan:** Runs `zap-baseline.py` on the frontend endpoint.
+- **Report Upload:** Uploads HTML, JSON, and Markdown reports.
+- **Issue Creation:** Automatically opens GitHub issues on vulnerabilities found.
 
 ## 🔔 `slack-alert`
-**Objective:** Notifications based on results.
+**Objective:** Send real-time Slack alerts based on scan results.
 
-- Evaluates job statuses
-- Summarises ESLint and ZAP alerts
-- Sends a formatted alert message to the Slack channel
+- **Status Check:** Evaluates the conclusion of `security-scan` and `zap-scan` jobs.
+- **Report Parsing:** Analyses ESLint and ZAP outputs to count and categorise issues.
+- **Slack Notify:** Posts a detailed summary including:
+  - ESLint Issues
+  - ZAP Vulnerabilities (by severity)
+  - Direct GitHub Actions run link
 
 ---
 
