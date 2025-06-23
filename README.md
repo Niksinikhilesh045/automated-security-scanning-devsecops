@@ -40,17 +40,66 @@ A GitHub Actions-powered CI/CD pipeline for **automated application security sca
 
 ---
 
-## 🧱 Project Structure
+## 📁 Project Structure
 
 ```bash
 project-root/
-├── .github/workflows/devsecops.yml     # CI/CD pipeline configuration
-├── client/                             # React frontend
-├── server/                             # Node/Express backend
-│   ├── Dockerfile                      # Dockerfile for server
-│   └── package.json                    # Backend dependencies
-├── docker-compose.yml                 # Docker Compose setup
-└── README.md                           # Project overview and documentation
+├── .github/
+│   └── workflows/
+│       └── devsecops.yml           # CI/CD pipeline configuration (DevSecOps)
+├── client/                         # React frontend application
+│   ├── public/
+│   │   └── vite.svg                # Vite logo asset
+│   ├── src/
+│   │   ├── assets/
+│   │   │   └── react.svg           # React logo
+│   │   ├── components/             # UI components
+│   │   │   ├── AddCourse.jsx
+│   │   │   ├── Appbar.jsx
+│   │   │   ├── Course.jsx
+│   │   │   ├── Home.jsx
+│   │   │   ├── Loading.jsx
+│   │   │   ├── PurchaseCourses.jsx
+│   │   │   ├── Signin.jsx
+│   │   │   ├── Signup.jsx
+│   │   │   └── UpdateCourse.jsx
+│   │   ├── store/
+│   │   │   ├── atoms/
+│   │   │   │   ├── course.js       # Recoil atoms for course state
+│   │   │   │   └── user.js         # Recoil atoms for user state
+│   │   │   └── selectors/
+│   │   │       ├── course.js       # Course selectors
+│   │   │       └── isUserLoading.js# Selector for loading state
+│   │   ├── App.css                 # Global app CSS
+│   │   ├── App.jsx                 # Main React component
+│   │   ├── index.css               # Base CSS
+│   │   └── main.jsx                # App entry point
+│   ├── .eslintrc.cjs               # ESLint config
+│   ├── Dockerfile                  # Dockerfile for frontend container
+│   ├── index.html                  # HTML template
+│   ├── nginx.conf                  # NGINX config for frontend
+│   ├── package-lock.json
+│   ├── package.json
+│   └── vite.config.js              # Vite config file
+├── server/                         # Node.js backend (Express + MongoDB)
+│   ├── Dockerfile                  # Dockerfile for backend container
+│   ├── .env                        # Environment variables
+│   ├── index.js                    # Main entry point
+│   ├── middleware/
+│   │   ├── adminAuth.js            # Admin authentication middleware
+│   │   └── userAuth.js             # User authentication middleware
+│   ├── routes/
+│   │   ├── admin.js                # Admin API routes
+│   │   └── users.js                # User API routes
+│   ├── package-lock.json
+│   └── package.json                # Backend dependencies and scripts
+├── docker-compose.yml             # Docker Compose setup for full stack
+├── .env                            # Global environment variables
+├── .gitleaks.toml                  # Gitleaks configuration for secret scanning
+├── known-hosts                     # SSH known hosts file for secure deploys
+├── package-lock.json
+├── package.json
+└── README.md                       # Project overview and documentation
 ```
 
 ---
