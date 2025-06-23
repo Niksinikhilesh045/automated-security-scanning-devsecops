@@ -85,11 +85,11 @@ The backend is built using Node.js with Express.js and MongoDB (via Mongoose). I
       - Browse available courses
       - Purchase and view purchased courses
 
-  - Environment Configurations
-    - `.env`: Stores sensitive credentials like the JWT secret (`DB_KEY`) and MongoDB connection URI (`DB_URL`), injected securely in GitHub Actions.
+- Environment Configurations
+  - `.env`: Stores sensitive credentials like the JWT secret (`DB_KEY`) and MongoDB connection URI (`DB_URL`), injected securely in GitHub Actions.
 
-  - Dockerfile
-    Containerises the backend service. It copies the code, installs dependencies, and exposes the application on a specified port.
+- Dockerfile
+  Containerises the backend service. It copies the code, installs dependencies, and exposes the application on a specified port.
 
 ---
 
