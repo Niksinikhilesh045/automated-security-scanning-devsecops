@@ -55,16 +55,41 @@ project-root/
 
 ---
 
-## 📊 Pipeline Features
+# 💻 Application Development Architecture
 
-* Static Code Analysis with CodeQL
-* Dependency Scanning using Snyk
-* Secrets Detection via Gitleaks
-* Container Vulnerability Scanning with Trivy
-* Docker Best Practices Linting via Dockle
-* DAST Scanning with OWASP ZAP
-* Slack Notification on failure
-* Multi-tagged Docker Builds and Pushes to DockerHub
+This project is a full-stack web application developed with **HTML**, **JavaScript**, and **React.js**. The front end was crafted to serve a responsive and user-friendly interface. Key features of the application include dynamic data rendering, RESTful API integration, and reusable component structures.
+
+The project is a full-stack course-selling web Application, divided into two main components: a Frontend (Client) and a Backend (Server)—both containerised and orchestrated via Docker.
+
+## 🧠 Backend: `./server` Directory
+The backend is built using Node.js with Express.js and MongoDB (via Mongoose). It implements a RESTful API for admin and user operations, and uses JWT-based authentication middleware.
+
+**✅ Core Components:**
+- `index.js`
+  Acts as the application entry point. It sets up the Express server, connects to MongoDB using mongoose, initializes middlewares, and mounts both user and admin routes.
+
+- Authentication Middlewares
+  - `adminAuth.js`: Verifies admin JWT tokens to protect admin routes.
+  - `userAuth.js`: Verifies user JWT tokens for accessing user features like course purchase and access.
+
+- Route Handlers
+  - `routes/admin.js`:
+     Handles admin functionalities including:
+      - Admin signup/login
+      - Create, update, and delete courses
+      - View all or specific courses
+
+  - `routes/users.js`:
+     Handles user functionalities including:
+      - User signup/login
+      - Browse available courses
+      - Purchase and view purchased courses
+
+  - Environment Configurations
+    - `.env`: Stores sensitive credentials like the JWT secret (`DB_KEY`) and MongoDB connection URI (`DB_URL`), injected securely in GitHub Actions.
+
+  - Dockerfile
+    Containerises the backend service. It copies the code, installs dependencies, and exposes the application on a specified port.
 
 ---
 
