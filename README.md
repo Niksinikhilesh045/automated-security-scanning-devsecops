@@ -65,7 +65,7 @@ The project is a full-stack course-selling web Application, divided into two mai
 The backend is built using Node.js with Express.js and MongoDB (via Mongoose). It implements a RESTful API for admin and user operations, and uses JWT-based authentication middleware.
 
 **✅ Core Components:**
-- `index.js`
+- `index.js`:
   Acts as the application entry point. It sets up the Express server, connects to MongoDB using mongoose, initializes middlewares, and mounts both user and admin routes.
 
 - Authentication Middlewares
@@ -88,8 +88,47 @@ The backend is built using Node.js with Express.js and MongoDB (via Mongoose). I
 - Environment Configurations
   - `.env`: Stores sensitive credentials like the JWT secret (`DB_KEY`) and MongoDB connection URI (`DB_URL`), injected securely in GitHub Actions.
 
-- Dockerfile
+- Dockerfile:
   Containerises the backend service. It copies the code, installs dependencies, and exposes the application on a specified port.
+
+## 🌐 Frontend — client/ Directory
+The frontend is developed using ReactJS and leverages the Recoil library for state management.
+
+**🧱 Structure:**
+- `public/`: Static files including vite.svg.
+- `src/`:
+   - `assets/`: App assets like react.svg.
+   - `components/`: Reusable components:
+      - `Appbar.jsx`, `Home.jsx`, `Signin.jsx`, `Signup.jsx`, `Course.jsx`, `AddCourse.jsx`, `UpdateCourse.jsx`, `PurchaseCourses.jsx`, `Loading.jsx`.
+   - `store/`: Application state management using Recoil:
+      - `atoms/`:
+         - `course.js`: Holds course state.
+         - `user.js`: Holds user state.
+      - `selectors/`:
+         - `course.js`: Derives course-related data like title, description, image, etc., from state.
+         - `isUserLoading.js`: Computes user loading status for conditional rendering.
+
+**🛠️ Key Highlights:**
+- Uses Recoil to separate business logic from component logic.-
+- Modular design allows scalable development and easy integration with the backend.
+- Fully compatible with Vite for fast development and builds.
+
+## 🔐 DevSecOps Implementation (CI/CD)
+
+The entire application lifecycle is **secured and automated** using **GitHub Actions** with detailed CI/CD stages:
+
+| **Stage**        | **Tools & Purpose**                                                                                               |
+|------------------|--------------------------------------------------------------------------------------------------------------------|
+| **Security Scan**| `CodeQL` (SAST), `Snyk` (dependency scan), `Gitleaks` (secret detection), `Hadolint` (Dockerfile lint), `Dockle` (image hardening), `Trivy` (image CVE scan) |
+| **Build**        | `docker-compose build` for backend and frontend containers                                                        |
+| **Push**         | Docker images tagged with `latest` and `commit-SHA` pushed to DockerHub                                           |
+| **DAST Scan**    | `OWASP ZAP` runs automated dynamic scans on the deployed frontend                                                 |
+| **Slack Alerts** | Sends detailed job statuses and vulnerability summaries using formatted Slack messages                            |
+
+This pipeline ensures:
+-  **Pre-merge security assurance**
+-  **Automated deployment readiness**
+-  **Continuous feedback loops via Slack**
 
 ---
 
