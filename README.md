@@ -162,6 +162,28 @@ The frontend is developed using ReactJS and leverages the Recoil library for sta
 - Modular design allows scalable development and easy integration with the backend.
 - Fully compatible with Vite for fast development and builds.
 
+---
+
+# 🐳 Docker Build & Deployment
+You can containerise and run the full application using Docker and Docker Compose. Follow these steps:
+
+## 🔧 Step 1: Build Docker Images
+You can build the frontend and backend containers individually:
+```bash
+# Build backend (server)
+docker build -t myapp-backend ./server
+
+# Build frontend (client)
+docker build -t myapp-frontend ./client
+```
+Or use Docker Compose for a unified build:
+```bash
+docker-compose build
+```
+✅ This command builds both the Node.js backend and the React frontend, using their respective Dockerfiles.
+
+---
+
 ## 🔐 DevSecOps Implementation (CI/CD)
 
 The entire application lifecycle is **secured and automated** using **GitHub Actions** with detailed CI/CD stages:
