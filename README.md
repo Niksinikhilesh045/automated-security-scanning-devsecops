@@ -182,19 +182,19 @@ docker-compose build
 ```
 ✅ This command builds both the Node.js backend and the React frontend, using their respective Dockerfiles.
 
-<figure>
-  <img src="images/Screenshot 2025-06-24 161738.png" alt="Backened" width="500">
-  <figcaption>Figure 1: Backend is Live!</figcaption>
+<figure style="text-align: center;">
+  <img src="images/Screenshot 2025-06-24 161738.png" alt="Screenshot" style="display: block; margin: 0 auto;" width="500">
+  <figcaption style="font-style: italic;">Figure 1: Backend is Live!</figcaption>
 </figure>
 
-<figure>
-  <img src="images/Screenshot 2025-06-24 161756" alt="Frontend" width="500">
-  <figcaption>Figure 2: Home Page of the Course Selling Website</figcaption>
+<figure style="text-align: center;">
+  <img src="images/Screenshot 2025-06-24 161756.png" alt="Screenshot" style="display: block; margin: 0 auto;" width="500">
+  <figcaption style="font-style: italic;">Figure 2: Home page of the Course Selling Website.</figcaption>
 </figure>
 
-<figure>
-  <img src="images/Screenshot 2025-06-24 162556" alt="Courses" width="500">
-  <figcaption>Figure 1: Course Live on the Website!</figcaption>
+<figure style="text-align: center;">
+  <img src="images/Screenshot 2025-06-24 162556.png" alt="Screenshot" style="display: block; margin: 0 auto;" width="500">
+  <figcaption style="font-style: italic;">Figure 3: Course Live in the Website!</figcaption>
 </figure>
 
 ---
