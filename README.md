@@ -182,20 +182,20 @@ docker-compose build
 ```
 ✅ This command builds both the Node.js backend and the React frontend, using their respective Dockerfiles.
 
-<figure style="text-align: center;">
-  <img src="images/Screenshot 2025-06-24 161738.png" alt="Screenshot" style="display: block; margin: 0 auto;" width="500">
-  <figcaption style="font-style: italic;">Figure 1: Backend is Live!</figcaption>
-</figure>
+<p align="center">
+  <img src="images/Screenshot 2025-06-24 161738.png" alt="Backend Live" width="500">
+</p>
+<p align="center"><em>Figure 1: Backend is Live!</em></p>
 
-<figure style="text-align: center;">
-  <img src="images/Screenshot 2025-06-24 161756.png" alt="Screenshot" style="display: block; margin: 0 auto;" width="500">
-  <figcaption style="font-style: italic;">Figure 2: Home page of the Course Selling Website.</figcaption>
-</figure>
+<p align="center">
+  <img src="images/Screenshot 2025-06-24 161756.png" alt="Home Page" width="500">
+</p>
+<p align="center"><em>Figure 2: Home page of the Course Selling Website.</em></p>
 
-<figure style="text-align: center;">
-  <img src="images/Screenshot 2025-06-24 162556.png" alt="Screenshot" style="display: block; margin: 0 auto;" width="500">
-  <figcaption style="font-style: italic;">Figure 3: Course Live in the Website!</figcaption>
-</figure>
+<p align="center">
+  <img src="images/Screenshot 2025-06-24 162556.png" alt="Course Live" width="500">
+</p>
+<p align="center"><em>Figure 3: Course Live in the Website!</em></p>
 
 ---
 
