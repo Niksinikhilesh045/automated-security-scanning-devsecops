@@ -308,3 +308,28 @@ This pipeline includes five key stages with integrated security and build proces
 <p align="center"><em>ZAP result preview</em></p>
 
 ---
+
+## ▶️ How to Trigger CI/CD via GitHub Actions
+You can trigger the pipeline in two ways:
+
+**1. Push to Main**
+Any commit to the `main` branch automatically triggers the full CI/CD workflow:
+```bash
+git add .
+git commit -m "trigger pipeline"
+git push origin main
+```
+
+**2. Pull Request**
+Opening a pull request to `main` will run the full workflow with comments and security feedback.
+
+Once triggered, GitHub Actions will:
+1. Run security scans (CodeQL, Snyk, Trivy, Gitleaks)
+2. Build Docker containers
+3. Push to DockerHub
+4. Run ZAP DAST scans
+5. Send Slack alerts if any vulnerabilities or failures are found
+
+---
+
+*🔁 This DevSecOps pipeline is reusable and modular—easily extendable to accommodate custom security policies and production requirements.*
