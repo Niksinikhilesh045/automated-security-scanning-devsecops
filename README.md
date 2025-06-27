@@ -185,17 +185,17 @@ docker-compose build
 <p align="center">
   <img src="images/Screenshot 2025-06-24 161738.png" alt="Backend Live" width="500">
 </p>
-<p align="center"><em>Figure 1: Backend is Live!</em></p>
+<p align="center"><em>Image 1: Backend is Live!</em></p>
 
 <p align="center">
   <img src="images/Screenshot 2025-06-24 161756.png" alt="Home Page" width="500">
 </p>
-<p align="center"><em>Figure 2: Home page of the Course Selling Website.</em></p>
+<p align="center"><em>Image 2: Home page of the Course Selling Website.</em></p>
 
 <p align="center">
   <img src="images/Screenshot 2025-06-24 162556.png" alt="Course Live" width="500">
 </p>
-<p align="center"><em>Figure 3: Course Live in the Website!</em></p>
+<p align="center"><em>Image 3: Course Live in the Website!</em></p>
 
 ---
 
@@ -282,5 +282,29 @@ This pipeline includes five key stages with integrated security and build proces
 | Image Vulnerability Scan          | Trivy            | GitHub Action Logs           |
 | DAST (Web App Scan)               | OWASP ZAP        | GitHub Issues + Artifacts    |
 | Slack Notification                | curl             | Slack Channel                |
+
+---
+
+## 📸 CI/CD Pipeline Visual Overview
+
+<p align="center">
+  <img src="images/Screenshot 2025-06-20 163111.png" alt="Course Live" width="500">
+</p>
+<p align="center"><em>GitHub Actions run</em></p>
+
+<p align="center">
+  <img src="images/Screenshot 2025-06-20 163145.png" alt="Course Live" width="500">
+</p>
+<p align="center"><em>Snyk result preview</em></p>
+
+<p align="center">
+  <img src="images/Screenshot 2025-06-20 163219.png" alt="Course Live" width="500">
+</p>
+<p align="center"><em>Slack alert preview showing ZAP or Trivy alerts</em></p>
+
+<p align="center">
+  <img src="images/Screenshot 2025-06-20 163620.png" alt="Course Live" width="500">
+</p>
+<p align="center"><em>ZAP result preview</em></p>
 
 ---
