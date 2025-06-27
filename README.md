@@ -167,7 +167,7 @@ The frontend is developed using ReactJS and leverages the Recoil library for sta
 # 🐳 Docker Build & Deployment
 You can containerise and run the full application using Docker and Docker Compose. Follow these steps:
 
-## 🔧 Step 1: Build Docker Images
+##  Step 1: Build Docker Images
 You can build the frontend and backend containers individually:
 ```bash
 # Build backend (server)
@@ -196,6 +196,24 @@ docker-compose build
   <img src="images/Screenshot 2025-06-24 162556.png" alt="Course Live" width="500">
 </p>
 <p align="center"><em>Image 3: Course Live in the Website!</em></p>
+
+##  Step 2: Deploy with Docker Compose
+To start all services using Docker Compose:
+```bash
+docker-compose up
+```
+
+To run in the background:
+```bash
+docker-compose up -d
+```
+
+This launches:
+  - The Express backend (exposing APIs)
+  - The React frontend via NGINX
+  - Both containers are linked and networked via Docker Compose
+
+Ensure required environment variables are defined in .env files in the root and server/ directories.
 
 ---
 
