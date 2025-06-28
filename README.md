@@ -140,7 +140,7 @@ The backend is built using Node.js with Express.js and MongoDB (via Mongoose). I
 - Dockerfile:
   Containerises the backend service. It copies the code, installs dependencies, and exposes the application on a specified port.
 
-###  Frontend — client/ Directory
+###  Frontend — `client/` Directory
 The frontend is developed using ReactJS and leverages the Recoil library for state management.
 
 **Structure:**
