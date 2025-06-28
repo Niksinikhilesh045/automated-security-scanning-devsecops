@@ -6,9 +6,9 @@ A GitHub Actions-powered CI/CD pipeline for **automated application security sca
 
 ---
 
-## 🚀 Tech Stack & Tools Used
+##  Tech Stack & Tools Used
 
-### 🧱 Application Stack
+###  Application Stack
 
 [![HTML5](https://img.shields.io/badge/HTML5-e34f26?style=for-the-badge&logo=html5&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/HTML)
 [![JavaScript](https://img.shields.io/badge/JavaScript-f7df1e?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
@@ -19,7 +19,7 @@ A GitHub Actions-powered CI/CD pipeline for **automated application security sca
 
 ---
 
-### 🔐 DevSecOps & Security Tools
+###  DevSecOps & Security Tools
 
 [![CodeQL](https://img.shields.io/badge/CodeQL-2b2b2b?style=for-the-badge&logo=github&logoColor=white)](https://codeql.github.com/)
 [![Snyk](https://img.shields.io/badge/Snyk-4c4a73?style=for-the-badge&logo=snyk&logoColor=white)](https://snyk.io/)
@@ -31,7 +31,7 @@ A GitHub Actions-powered CI/CD pipeline for **automated application security sca
 
 ---
 
-### ⚙️ CI/CD and Monitoring
+###  CI/CD and Monitoring
 
 [![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/features/actions)
 [![YAML](https://img.shields.io/badge/YAML-000000?style=for-the-badge&logo=yaml&logoColor=white)](https://yaml.org/)
@@ -40,7 +40,7 @@ A GitHub Actions-powered CI/CD pipeline for **automated application security sca
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```bash
 project-root/
@@ -104,16 +104,16 @@ project-root/
 
 ---
 
-# 💻 Application Development Architecture
+#  Application Development Architecture
 
 This project is a full-stack web application developed with **HTML**, **JavaScript**, and **React.js**. The front end was crafted to serve a responsive and user-friendly interface. Key features of the application include dynamic data rendering, RESTful API integration, and reusable component structures.
 
 The project is a full-stack course-selling web Application, divided into two main components: a Frontend (Client) and a Backend (Server)—both containerised and orchestrated via Docker.
 
-## 🧠 Backend: `./server` Directory
+##  Backend: `./server` Directory
 The backend is built using Node.js with Express.js and MongoDB (via Mongoose). It implements a RESTful API for admin and user operations, and uses JWT-based authentication middleware.
 
-**✅ Core Components:**
+**Core Components:**
 - `index.js`:
   Acts as the application entry point. It sets up the Express server, connects to MongoDB using mongoose, initializes middlewares, and mounts both user and admin routes.
 
@@ -140,10 +140,10 @@ The backend is built using Node.js with Express.js and MongoDB (via Mongoose). I
 - Dockerfile:
   Containerises the backend service. It copies the code, installs dependencies, and exposes the application on a specified port.
 
-## 🌐 Frontend — client/ Directory
+##  Frontend — client/ Directory
 The frontend is developed using ReactJS and leverages the Recoil library for state management.
 
-**🧱 Structure:**
+**Structure:**
 - `public/`: Static files including vite.svg.
 - `src/`:
    - `assets/`: App assets like react.svg.
@@ -164,7 +164,7 @@ The frontend is developed using ReactJS and leverages the Recoil library for sta
 
 ---
 
-# 🐳 Docker Build & Deployment
+#  Docker Build & Deployment
 You can containerise and run the full application using Docker and Docker Compose. Follow these steps:
 
 ##  Step 1: Build Docker Images
@@ -181,21 +181,6 @@ Or use Docker Compose for a unified build:
 docker-compose build
 ```
 ✅ This command builds both the Node.js backend and the React frontend, using their respective Dockerfiles.
-
-<p align="center">
-  <img src="images/Screenshot 2025-06-24 161738.png" alt="Backend Live" width="500">
-</p>
-<p align="center"><em>Image 1: Backend is Live!</em></p>
-
-<p align="center">
-  <img src="images/Screenshot 2025-06-24 161756.png" alt="Home Page" width="500">
-</p>
-<p align="center"><em>Image 2: Home page of the Course Selling Website.</em></p>
-
-<p align="center">
-  <img src="images/Screenshot 2025-06-24 162556.png" alt="Course Live" width="500">
-</p>
-<p align="center"><em>Image 3: Course Live in the Website!</em></p>
 
 ##  Step 2: Deploy with Docker Compose
 To start all services using Docker Compose:
@@ -215,9 +200,24 @@ This launches:
 
 Ensure required environment variables are defined in .env files in the root and server/ directories.
 
+<p align="center">
+  <img src="images/Screenshot 2025-06-24 161738.png" alt="Backend Live" width="500">
+</p>
+<p align="center"><em>Image 1: Backend is Live!</em></p>
+
+<p align="center">
+  <img src="images/Screenshot 2025-06-24 161756.png" alt="Home Page" width="500">
+</p>
+<p align="center"><em>Image 2: Home page of the Course Selling Website.</em></p>
+
+<p align="center">
+  <img src="images/Screenshot 2025-06-24 162556.png" alt="Course Live" width="500">
+</p>
+<p align="center"><em>Image 3: Course Live in the Website!</em></p>
+
 ---
 
-## 🔐 DevSecOps Implementation (CI/CD)
+##  DevSecOps Implementation (CI/CD)
 
 The entire application lifecycle is **secured and automated** using **GitHub Actions** with detailed CI/CD stages:
 
@@ -236,11 +236,11 @@ This pipeline ensures:
 
 ---
 
-# 🧬 CI/CD Pipeline Overview
+#  CI/CD Pipeline Overview
 
 This pipeline includes five key stages with integrated security and build processes:
 
-## 🛡️ `security-scan`
+##  `security-scan`
 **Objective:** Run comprehensive static security scans and prepare development artifacts.
 
 - **Node Setup:** Installs Node.js 24.0.2 for compatibility with tools like Snyk.
@@ -259,14 +259,14 @@ This pipeline includes five key stages with integrated security and build proces
 - **Secrets Injection:** Securely injects DB credentials into `.env` files.
 - **Compose Build:** Builds multi-container services from `docker-compose.yml`.
 
-## 📦 `dockerhub-push`
+##  `dockerhub-push`
 **Objective:** Create and push versioned Docker images.
 
 - **Docker Login:** Authenticates with DockerHub using secrets.
 - **Image Tagging:** Tags the image using both `latest` and Git short SHA.
 - **Push:** Publishes both image tags to DockerHub.
 
-## 🔥 `zap-scan`
+##  `zap-scan`
 **Objective:** Perform DAST scanning using OWASP ZAP.
 
 - **Start Frontend:** Spins up the client service using Docker Compose.
@@ -276,7 +276,7 @@ This pipeline includes five key stages with integrated security and build proces
 - **Report Upload:** Uploads HTML, JSON, and Markdown reports.
 - **Issue Creation:** Automatically opens GitHub issues on vulnerabilities found.
 
-## 🔔 `slack-alert`
+##  `slack-alert`
 **Objective:** Send real-time Slack alerts based on scan results.
 
 - **Status Check:** Evaluates the conclusion of `security-scan` and `zap-scan` jobs.
@@ -288,7 +288,7 @@ This pipeline includes five key stages with integrated security and build proces
 
 ---
 
-# ✅ Security Coverage Summary
+#  Security Coverage Summary
 
 | Check Type                         | Tool Used        | Reported To                  |
 |-----------------------------------|------------------|------------------------------|
@@ -303,7 +303,7 @@ This pipeline includes five key stages with integrated security and build proces
 
 ---
 
-## 📸 CI/CD Pipeline Visual Overview
+##  CI/CD Pipeline Visual Overview
 
 <p align="center">
   <img src="images/Screenshot 2025-06-20 163111.png" alt="Course Live" width="500">
@@ -327,7 +327,7 @@ This pipeline includes five key stages with integrated security and build proces
 
 ---
 
-## ▶️ How to Trigger CI/CD via GitHub Actions
+##  How to Trigger CI/CD via GitHub Actions
 You can trigger the pipeline in two ways:
 
 **1. Push to Main**
