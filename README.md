@@ -1,4 +1,4 @@
-# 🔐 Automated Security Scanning within DevSecOps CI/CD Pipeline
+#  Automated Security Scanning within DevSecOps CI/CD Pipeline
 
 A GitHub Actions-powered CI/CD pipeline for **automated application security scanning** and **containerised deployments** with real-time vulnerability reporting. This project integrates multiple security layers—SAST, DAST, dependency scanning, container scanning, secret detection, and notification delivery—to ensure production-grade security from development to deployment.
 
@@ -104,13 +104,13 @@ project-root/
 
 ---
 
-#  Application Development Architecture
+##  Application Development Architecture
 
 This project is a full-stack web application developed with **HTML**, **JavaScript**, and **React.js**. The front end was crafted to serve a responsive and user-friendly interface. Key features of the application include dynamic data rendering, RESTful API integration, and reusable component structures.
 
 The project is a full-stack course-selling web Application, divided into two main components: a Frontend (Client) and a Backend (Server)—both containerised and orchestrated via Docker.
 
-##  Backend: `./server` Directory
+###  Backend: `./server` Directory
 The backend is built using Node.js with Express.js and MongoDB (via Mongoose). It implements a RESTful API for admin and user operations, and uses JWT-based authentication middleware.
 
 **Core Components:**
@@ -140,7 +140,7 @@ The backend is built using Node.js with Express.js and MongoDB (via Mongoose). I
 - Dockerfile:
   Containerises the backend service. It copies the code, installs dependencies, and exposes the application on a specified port.
 
-##  Frontend — client/ Directory
+###  Frontend — client/ Directory
 The frontend is developed using ReactJS and leverages the Recoil library for state management.
 
 **Structure:**
@@ -157,17 +157,17 @@ The frontend is developed using ReactJS and leverages the Recoil library for sta
          - `course.js`: Derives course-related data like title, description, image, etc., from state.
          - `isUserLoading.js`: Computes user loading status for conditional rendering.
 
-**🛠️ Key Highlights:**
+**Key Highlights:**
 - Uses Recoil to separate business logic from component logic.-
 - Modular design allows scalable development and easy integration with the backend.
 - Fully compatible with Vite for fast development and builds.
 
 ---
 
-#  Docker Build & Deployment
+##  Docker Build & Deployment
 You can containerise and run the full application using Docker and Docker Compose. Follow these steps:
 
-##  Step 1: Build Docker Images
+###  Step 1: Build Docker Images
 You can build the frontend and backend containers individually:
 ```bash
 # Build backend (server)
@@ -182,7 +182,7 @@ docker-compose build
 ```
 ✅ This command builds both the Node.js backend and the React frontend, using their respective Dockerfiles.
 
-##  Step 2: Deploy with Docker Compose
+###  Step 2: Deploy with Docker Compose
 To start all services using Docker Compose:
 ```bash
 docker-compose up
@@ -236,11 +236,11 @@ This pipeline ensures:
 
 ---
 
-#  CI/CD Pipeline Overview
+##  CI/CD Pipeline Overview
 
 This pipeline includes five key stages with integrated security and build processes:
 
-##  `security-scan`
+###  `security-scan`
 **Objective:** Run comprehensive static security scans and prepare development artifacts.
 
 - **Node Setup:** Installs Node.js 24.0.2 for compatibility with tools like Snyk.
@@ -253,20 +253,20 @@ This pipeline includes five key stages with integrated security and build proces
 - **Trivy:** Performs vulnerability scanning on the Docker image, reporting CRITICAL/HIGH CVEs.
 - **Artifact Uploads:** All SARIF and scan reports are uploaded for GitHub security insights.
 
-## 🛠️ `build`
+###  `build`
 **Objective:** Build the application stack using Docker Compose.
 
 - **Secrets Injection:** Securely injects DB credentials into `.env` files.
 - **Compose Build:** Builds multi-container services from `docker-compose.yml`.
 
-##  `dockerhub-push`
+###  `dockerhub-push`
 **Objective:** Create and push versioned Docker images.
 
 - **Docker Login:** Authenticates with DockerHub using secrets.
 - **Image Tagging:** Tags the image using both `latest` and Git short SHA.
 - **Push:** Publishes both image tags to DockerHub.
 
-##  `zap-scan`
+###  `zap-scan`
 **Objective:** Perform DAST scanning using OWASP ZAP.
 
 - **Start Frontend:** Spins up the client service using Docker Compose.
@@ -276,7 +276,7 @@ This pipeline includes five key stages with integrated security and build proces
 - **Report Upload:** Uploads HTML, JSON, and Markdown reports.
 - **Issue Creation:** Automatically opens GitHub issues on vulnerabilities found.
 
-##  `slack-alert`
+###  `slack-alert`
 **Objective:** Send real-time Slack alerts based on scan results.
 
 - **Status Check:** Evaluates the conclusion of `security-scan` and `zap-scan` jobs.
@@ -288,7 +288,7 @@ This pipeline includes five key stages with integrated security and build proces
 
 ---
 
-#  Security Coverage Summary
+##  Security Coverage Summary
 
 | Check Type                         | Tool Used        | Reported To                  |
 |-----------------------------------|------------------|------------------------------|
